@@ -48,7 +48,8 @@
         
         /* Mengatur padding bawah untuk halaman agar tidak tertutup nav bottom dan footer baru */
         #page-home main, #page-detail main, #page-liked main, #page-admin main, #page-login main, #page-edit main, #page-promo-edit main {
-            padding-bottom: 200px; /* Diperkirakan cukup untuk nav bottom + footer statis */
+            /* Disesuaikan: 56px (nav bottom) + 144px (footer baru) = 200px */
+            padding-bottom: 200px; 
         }
     </style>
 </head>
@@ -457,11 +458,11 @@
         </nav>
     </div>
 
-    <!-- ===== FOOTER MODERN (BARU) ===== -->
+    <!-- ===== FOOTER MODERN (SEDERHANA) ===== -->
     <footer id="main-footer" class="bg-gray-800 text-gray-300 py-8 mt-16 shadow-inner w-full">
         <div class="max-w-md mx-auto px-4">
             <!-- Logo & Slogan -->
-            <div class="mb-6 text-center">
+            <div class="mb-6 text-center border-b border-gray-700 pb-4">
                 <div class="flex items-center justify-center gap-2 mb-2">
                     <img src="https://i.ibb.co.com/n86sQs1v/Logo-Toko-Aneka-Cemilan-Snack-Ceria-Oranye-Kuning-20251105_010226_0000.png" alt="Kriuké Snack Logo" class="h-8 w-auto">
                     <span class="text-xl font-bold text-orange-500">Kriuké Snack</span>
@@ -469,30 +470,19 @@
                 <p class="text-sm text-gray-400">Kriuknya Beda, Rasanya Istimewa.</p>
             </div>
 
-            <!-- Quick Links / Informasi -->
-            <!-- Ubah grid-cols-2 statis menjadi satu kolom di mobile dan dua kolom di sm: -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-6 border-t border-gray-700 pt-6">
-                <div>
-                    <h5 class="text-md font-semibold text-white mb-3 mt-0">Informasi</h5>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-orange-500 transition-colors">Tentang Kami</a></li>
-                        <li><a href="#" class="hover:text-orange-500 transition-colors">Kebijakan Privasi</a></li>
-                        <li><a href="#" class="hover:text-orange-500 transition-colors">Syarat & Ketentuan</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h5 class="text-md font-semibold text-white mb-3 mt-0">Hubungi Kami</h5>
-                    <ul class="space-y-2 text-sm">
-                        <li class="flex items-center gap-2">
-                            <i class="fa-brands fa-whatsapp text-green-500"></i>
-                            <a href="https://wa.me/6282349786916" target="_blank" class="hover:text-green-400">0823-4978-6916</a>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <i class="fa-solid fa-envelope text-orange-500"></i>
-                            <a href="mailto:kriuke@snack.id" class="hover:text-orange-500">kriuke@snack.id</a>
-                        </li>
-                    </ul>
-                </div>
+            <!-- Kontak & Sosial Media -->
+            <div class="text-center mb-6">
+                <h5 class="text-md font-semibold text-white mb-3">Hubungi Kami</h5>
+                <ul class="space-y-2 text-sm max-w-xs mx-auto">
+                    <li class="flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-green-500"></i>
+                        <a href="https://wa.me/6282349786916" target="_blank" class="hover:text-green-400">0823-4978-6916</a>
+                    </li>
+                    <li class="flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-envelope text-orange-500"></i>
+                        <a href="mailto:kriuke@snack.id" class="hover:text-orange-500">kriuke@snack.id</a>
+                    </li>
+                </ul>
             </div>
 
             <!-- Social Media Icons -->
@@ -890,11 +880,109 @@
                 }
             }
             
+            // FUNGSI UNTUK MERENDER BINTANG RATING
+            function renderStars(rating) {
+                const fullStars = Math.floor(rating);
+                const hasHalfStar = rating % 1 !== 0;
+                let starsHtml = '';
+                
+                for (let i = 0; i < 5; i++) {
+                    if (i < fullStars) {
+                        starsHtml += '<i class="fa-solid fa-star text-yellow-400"></i>';
+                    } else if (i === fullStars && hasHalfStar) {
+                        starsHtml += '<i class="fa-solid fa-star-half-stroke text-yellow-400"></i>';
+                    } else {
+                        starsHtml += '<i class="fa-regular fa-star text-gray-300"></i>';
+                    }
+                }
+                return starsHtml;
+            }
+
             // FUNGSI DETAIL PRODUK
             function showProductDetail(id) {
                 const product = products.find(p => p.id === id);
                 if (!product) return;
                 
+                // Ambil rata-rata rating (jika ada ulasan)
+                const totalReviews = product.reviews ? product.reviews.length : 0;
+                const averageRating = product.reviews 
+                    ? (product.reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1)
+                    : product.rating; // Gunakan rating default jika tidak ada ulasan
+
+                // --- GENERATE ULASAN ---
+                let reviewSummaryHtml = '';
+                let reviewsListHtml = '';
+                
+                if (totalReviews > 0) {
+                    const ratingCounts = [0, 0, 0, 0, 0]; // Index 0=1 bintang, 4=5 bintang
+                    product.reviews.forEach(r => {
+                        // Kumpulkan hanya rating 4 dan 5 untuk ringkasan visual
+                        if (r.rating >= 4) {
+                            ratingCounts[r.rating - 1]++;
+                        }
+                    });
+                    
+                    const percent5 = ((ratingCounts[4] / totalReviews) * 100).toFixed(0);
+                    const percent4 = ((ratingCounts[3] / totalReviews) * 100).toFixed(0);
+
+                    reviewSummaryHtml = `
+                        <div class="mt-6 border p-4 bg-gray-50 rounded-lg">
+                            <h4 class="font-bold text-gray-800 mb-3">Ringkasan Rating (${totalReviews} Ulasan)</h4>
+                            <div class="space-y-1 text-sm">
+                                <!-- Bar Rating 5 Bintang -->
+                                <div class="flex items-center gap-2">
+                                    <span class="font-medium w-4">5</span>
+                                    ${renderStars(5)}
+                                    <div class="flex-grow bg-gray-200 h-2.5 rounded-full overflow-hidden">
+                                        <div class="bg-green-500 h-full" style="width: ${percent5}%;"></div>
+                                    </div>
+                                    <span class="w-10 text-right text-gray-600">${percent5}%</span>
+                                </div>
+                                <!-- Bar Rating 4 Bintang -->
+                                <div class="flex items-center gap-2">
+                                    <span class="font-medium w-4">4</span>
+                                    ${renderStars(4)}
+                                    <div class="flex-grow bg-gray-200 h-2.5 rounded-full overflow-hidden">
+                                        <div class="bg-green-400 h-full" style="width: ${percent4}%;"></div>
+                                    </div>
+                                    <span class="w-10 text-right text-gray-600">${percent4}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Generate list ulasan
+                    reviewsListHtml = `
+                        <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-4 border-t pt-4">Semua Ulasan Pelanggan</h3>
+                        <div class="space-y-6">
+                            ${product.reviews.map(review => `
+                                <div class="p-3 border-b border-gray-100">
+                                    <div class="flex items-center justify-between">
+                                        <p class="font-medium text-gray-800">${review.user}</p>
+                                        <div class="text-sm text-gray-500">${review.date}</div>
+                                    </div>
+                                    <div class="flex items-center text-sm mb-2">
+                                        <div class="text-lg mr-2">${renderStars(review.rating)}</div>
+                                        <span class="text-yellow-400 font-bold">${review.rating.toFixed(1)}</span>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">${review.comment}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+
+                } else {
+                    reviewsListHtml = `
+                        <div class="text-center py-8 border-t mt-8">
+                            <i class="fa-regular fa-comment-dots text-5xl text-gray-300 mb-3"></i>
+                            <p class="text-gray-500">Belum ada ulasan untuk produk ini.</p>
+                        </div>
+                    `;
+                }
+
+                // --- AKHIR GENERATE ULASAN ---
+
+
                 let thumbnailHTML = '';
                 product.images.forEach((img, index) => {
                     thumbnailHTML += `
@@ -929,13 +1017,17 @@
                         <div class="flex items-center justify-between my-2">
                             <p class="text-3xl font-bold text-red-600">Rp${formatRupiah(product.price)}</p>
                             <div class="flex items-center gap-1 text-lg">
-                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                ${renderStars(product.rating)}
                                 <span class="font-bold text-gray-800">${product.rating}</span>
-                                <span class="text-sm text-gray-500 ml-2">(1,2rb terjual)</span>
+                                <span class="text-sm text-gray-500 ml-2">(${totalReviews} ulasan)</span>
                             </div>
                         </div>
                         <h3 class="text-lg font-semibold mt-6 mb-2">Deskripsi Produk</h3>
                         <p class="text-gray-700 whitespace-pre-wrap mb-6">${product.description}</p>
+                        
+                        ${reviewSummaryHtml}
+
+                        ${reviewsListHtml}
 
                         <h4 class="font-semibold text-gray-800 mb-2 mt-5 text-sm">Beli di E-commerce:</h4>
                         <div class="grid grid-cols-4 gap-3 text-center mb-6"> 
@@ -1374,7 +1466,11 @@
                                 'https://placehold.co/300x300/8D6E63/FFFFFF?text=Original+Detail'
                             ],
                             description: 'Kripik pisang renyah dengan rasa asli pisang yang gurih alami. Cocok untuk semua kalangan dan camilan harian Anda. Kriuknya beda, rasanya istimewa!',
-                            isLiked: false
+                            isLiked: false,
+                            reviews: [
+                                { user: 'Ani', rating: 5, date: '10/05/2025', comment: 'Rasa original yang selalu bikin kangen! Kriuknya pas, tidak terlalu manis.' },
+                                { user: 'Budi', rating: 4, date: '12/05/2025', comment: 'Kualitas oke, packing aman. Hanya saja pengiriman agak lambat.' }
+                            ]
                         },
                         {
                             id: 'p2',
@@ -1389,7 +1485,11 @@
                                 'https://placehold.co/300x300/795548/FFFFFF?text=Coklat+Detail'
                             ],
                             description: 'Promo Spesial! Kripik pisang renyah dibalut dengan coklat premium yang lumer di mulut. Kriuknya beda, rasanya istimewa!',
-                            isLiked: false
+                            isLiked: false,
+                            reviews: [
+                                { user: 'Citra', rating: 5, date: '01/06/2025', comment: 'Coklatnya tebal! Harga promo sangat worth it. Anak-anak suka sekali.' },
+                                { user: 'Dedi', rating: 4, date: '05/06/2025', comment: 'Enak, tapi sedikit terlalu manis untuk saya. Overall bagus!' }
+                            ]
                         },
                         {
                             id: 'p3',
@@ -1402,7 +1502,10 @@
                                 'https://placehold.co/300x300/F44336/FFFFFF?text=Balado+Pack'
                             ],
                             description: 'Sensasi pedas manis bumbu balado khas yang bikin ketagihan. Dibuat dari cabai pilihan dan bumbu rempah Indonesia. Berani coba?',
-                            isLiked: false
+                            isLiked: false,
+                            reviews: [
+                                { user: 'Eka', rating: 5, date: '15/05/2025', comment: 'Pedasnya pas dan bumbunya melimpah! Bikin nagih, harus coba rasa ini.' }
+                            ]
                         },
                         {
                             id: 'p4',
@@ -1415,7 +1518,11 @@
                                 'https://placehold.co/300x300/D32F2F/FFFFFF?text=Pedas+Manis+Pack'
                             ],
                             description: 'Perpaduan sempurna antara rasa manis gula aren dan sensasi pedas yang hangat. Rasa yang pasti disukai semua orang!',
-                            isLiked: false
+                            isLiked: false,
+                            reviews: [
+                                { user: 'Fani', rating: 5, date: '20/05/2025', comment: 'Gilaa ini enak banget, perpaduan manis dan pedasnya seimbang.' },
+                                { user: 'Gatot', rating: 5, date: '22/05/2025', comment: 'Selalu beli yang ini. Terbaikkkk.' }
+                            ]
                         },
                         {
                             id: 'p5',
@@ -1429,7 +1536,8 @@
                                 'https://placehold.co/300x300/4CAF50/FFFFFF?text=Matcha+Detail'
                             ],
                             description: 'Bagi pecinta teh hijau! Kriuké dengan bubuk matcha asli Jepang, memberikan rasa manis pahit yang unik dan menenangkan.',
-                            isLiked: false
+                            isLiked: false,
+                            reviews: [] // Contoh produk tanpa ulasan
                         },
                         {
                             id: 'p6',
@@ -1443,7 +1551,10 @@
                                 'https://placehold.co/300x300/6D4C41/FFFFFF?text=Sapi+Panggang+Detail'
                             ],
                             description: 'Nikmati sensasi gurihnya bumbu sapi panggang premium dalam setiap gigitan kriuk. Cocok untuk Anda yang suka rasa asin dan gurih.',
-                            isLiked: false
+                            isLiked: false,
+                            reviews: [
+                                { user: 'Hana', rating: 4, date: '01/07/2025', comment: 'Rasa gurih yang mantap! Cocok buat teman nonton bola.' }
+                            ]
                         }
                     ];
                     saveProducts();
@@ -1559,7 +1670,9 @@
                     originalPrice: originalPrice, // Simpan harga asli
                     rating: newRating,
                     images: productImagesInput.value.split(',').map(url => url.trim()).filter(url => url),
-                    description: productDescInput.value
+                    description: productDescInput.value,
+                    // Pertahankan ulasan yang sudah ada saat mengedit
+                    reviews: id ? (products.find(p => p.id === id)?.reviews || []) : [] 
                 };
 
                 if (productData.images.length === 0) {
