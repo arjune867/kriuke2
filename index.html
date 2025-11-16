@@ -45,37 +45,46 @@
             -ms-overflow-style: none; /* IE and Edge */
             scrollbar-width: none; /* Firefox */
         }
+        
+        /* Mengatur padding bawah untuk halaman agar tidak tertutup nav bottom dan footer baru */
+        #page-home main, #page-detail main, #page-liked main, #page-admin main, #page-login main, #page-edit main, #page-promo-edit main {
+            padding-bottom: 200px; /* Diperkirakan cukup untuk nav bottom + footer statis */
+        }
     </style>
 </head>
 <body class="bg-gray-100">
 
     <!-- Notifikasi Toast -->
-    <div id="toast-notification" class="fixed top-20 left-1/2 -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-[100]">
+    <div id="toast-notification" class="fixed top-20 left-1/2 -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-[100] whitespace-nowrap">
         Item ditambahkan ke keranjang!
     </div>
 
     <!-- Kontainer utama aplikasi -->
     <div class="max-w-md mx-auto min-h-screen bg-white shadow-lg">
 
-        <!-- ===== HALAMAN HOME (Diubah agar sesuai gambar) ===== -->
+        <!-- ===== HALAMAN HOME ===== -->
         <div id="page-home" class="page active">
-            <!-- Header (Shopee-like, diubah) -->
+            <!-- Header -->
             <header class="sticky top-0 z-50 bg-white shadow-md p-4">
                 <div class="flex items-center justify-between mb-3">
                     <!-- Logo Kiri -->
                     <div class="flex items-center gap-2">
-                        <img src="https://i.ibb.co.com/n86sQs1v/Logo-Toko-Aneka-Cemilan-Snack-Ceria-Oranye-Kuning-20251105_010226-0000.png" alt="Kriuké Snack Logo" class="h-6 w-auto">
+                        <img src="https://i.ibb.co.com/n86sQs1v/Logo-Toko-Aneka-Cemilan-Snack-Ceria-Oranye-Kuning-20251105_010226_0000.png" alt="Kriuké Snack Logo" class="h-6 w-auto">
                         <span class="text-lg font-bold text-orange-600">Kriuké</span>
                     </div>
                     
-                    <!-- Cart & Menu Kanan -->
+                    <!-- Cart, WhatsApp & Menu Kanan -->
                     <div class="flex items-center gap-4">
+                        <!-- WhatsApp Button -->
+                        <a href="https://wa.me/6282349786916" target="_blank" class="text-2xl text-green-500 hover:text-green-600 transition-colors" aria-label="Hubungi via WhatsApp">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </a>
                         <!-- Cart Icon -->
                         <button id="cart-icon-btn" class="navigate-btn text-2xl text-gray-700 relative" data-target="page-cart">
                             <i class="fa-solid fa-cart-shopping"></i>
                             <span id="cart-count-badge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center opacity-0 transition-opacity">0</span>
                         </button>
-                        <!-- Menu Icon (FUNGSIONAL) -->
+                        <!-- Menu Icon -->
                         <button id="menu-toggle-btn" class="text-2xl text-gray-700">
                             <i class="fa-solid fa-bars"></i>
                         </button>
@@ -89,7 +98,23 @@
                 </div>
             </header>
 
-            <!-- Kategori Filter (Diubah gayanya) -->
+            <!-- ===== PROMO SLIDER (BARU) ===== -->
+            <div id="promo-slider-container" class="relative w-full h-48 overflow-hidden bg-gray-200">
+                <!-- Slide 1 -->
+                <div class="promo-slide absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-100">
+                    <img src="https://placehold.co/400x192/FF6B00/FFFFFF?text=Promo+Kriuk+Hemat" alt="Promo 1" class="w-full h-full object-cover">
+                </div>
+                <!-- Slide 2 -->
+                <div class="promo-slide absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0">
+                    <img src="https://placehold.co/400x192/4CAF50/FFFFFF?text=Gratis+Ongkir" alt="Promo 2" class="w-full h-full object-cover">
+                </div>
+                <!-- Slide 3 -->
+                <div class="promo-slide absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0">
+                    <img src="https://placehold.co/400x192/F44336/FFFFFF?text=Diskon+Akhir+Tahun" alt="Promo 3" class="w-full h-full object-cover">
+                </div>
+            </div>
+
+            <!-- Kategori Filter -->
             <div class="px-4 py-3 border-b border-gray-200">
                 <div id="category-filter-container" class="flex gap-2 overflow-x-auto">
                     <!-- Kategori akan di-render oleh JavaScript -->
@@ -114,7 +139,6 @@
                 <h2 class="text-lg font-semibold ml-4">Detail Produk</h2>
             </header>
             
-            <!-- Mengubah padding-bottom menjadi pb-20 karena tombol aksi tidak lagi floating -->
             <main id="detail-content" class="pb-20"> 
                 <!-- Detail akan di-render oleh JavaScript di sini -->
             </main>
@@ -144,11 +168,39 @@
             <main id="cart-items-container" class="p-4 pb-40">
                 <!-- Item keranjang akan di-render di sini -->
             </main>
+            
+            <!-- FOOTER KERANJANG (DIPERBARUI) -->
             <footer class="fixed bottom-16 left-1/2 -translate-x-1/2 max-w-md w-full p-4 bg-white border-t z-40">
-                <div class="flex justify-between items-center mb-3">
+                
+                <!-- Input Kode Promo (BARU) -->
+                <div class="mb-3">
+                    <label for="promo-code-input" class="block text-sm font-medium text-gray-700 mb-1">Kode Promo</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="promo-code-input" placeholder="Masukkan kode" class="flex-grow w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors uppercase" />
+                        <button id="apply-promo-btn" class="bg-orange-500 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-orange-600 transition-colors">Pakai</button>
+                    </div>
+                    <!-- Status message untuk promo -->
+                    <p id="promo-status-text" class="text-sm mt-1.5"></p>
+                </div>
+                
+                <!-- Subtotal (BARU) -->
+                <div class="flex justify-between items-center mb-2 mt-3">
+                    <span class="text-gray-700 font-medium">Subtotal:</span>
+                    <span id="cart-subtotal" class="text-lg font-medium text-gray-700">Rp0</span>
+                </div>
+                
+                <!-- Baris Diskon Promo (BARU) -->
+                <div id="promo-discount-row" class="hidden flex justify-between items-center mb-2">
+                    <span class="text-green-600 font-medium">Diskon Promo:</span>
+                    <span id="cart-promo-discount" class="text-lg font-medium text-green-600">-Rp0</span>
+                </div>
+
+                <!-- Total (Diubah) -->
+                <div class="flex justify-between items-center mb-3 border-t pt-2">
                     <span class="text-gray-700 font-medium">Total:</span>
                     <span id="cart-total" class="text-2xl font-bold text-orange-600">Rp0</span>
                 </div>
+                
                 <button id="checkout-wa-btn" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold shadow-lg hover:bg-green-600 transition-colors">
                     <i class="fa-solid fa-file-invoice mr-2"></i>
                     Lanjut ke Pengiriman
@@ -186,12 +238,28 @@
                     <p id="checkout-error" class="text-red-500 text-sm text-center mb-4"></p>
                 </form>
             </main>
+            
+            <!-- FOOTER CHECKOUT (DIPERBARUI) -->
             <footer class="fixed bottom-16 left-1/2 -translate-x-1/2 max-w-md w-full p-4 bg-white border-t z-40">
-                <div class="flex justify-between items-center mb-3">
+                
+                <!-- Subtotal (BARU) -->
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-700 font-medium">Subtotal:</span>
+                    <span id="checkout-page-subtotal" class="text-lg font-medium text-gray-700">Rp0</span>
+                </div>
+                
+                <!-- Baris Diskon Promo (BARU) -->
+                <div id="checkout-promo-discount-row" class="hidden flex justify-between items-center mb-2">
+                    <span class="text-green-600 font-medium">Diskon Promo:</span>
+                    <span id="checkout-page-promo-discount" class="text-lg font-medium text-green-600">-Rp0</span>
+                </div>
+                
+                <!-- Total (Diubah) -->
+                <div class="flex justify-between items-center mb-3 border-t pt-2">
                     <span class="text-gray-700 font-medium">Total:</span>
                     <span id="checkout-page-total" class="text-2xl font-bold text-orange-600">Rp0</span>
                 </div>
-                <!-- Tombol submit sekarang ada di dalam form -->
+                
                 <button type="submit" form="checkout-form" id="send-order-wa-btn" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold shadow-lg hover:bg-green-600 transition-colors">
                     <i class="fa-brands fa-whatsapp mr-2 text-xl"></i>
                     Kirim Pesanan via WhatsApp
@@ -205,7 +273,7 @@
                 <h2 class="text-lg font-semibold text-center">Login Admin</h2>
             </header>
             <main class="p-6 pt-10">
-                <img src="https://i.ibb.co.com/n86sQs1v/Logo-Toko-Aneka-Cemilan-Snack-Ceria-Oranye-Kuning-20251105_010226-0000.png" alt="Logo" class="w-32 mx-auto mb-6">
+                <img src="https://i.ibb.co.com/n86sQs1v/Logo-Toko-Aneka-Cemilan-Snack-Ceria-Oranye-Kuning-20251105_010226_0000.png" alt="Logo" class="w-32 mx-auto mb-6">
                 <form id="login-form">
                     <div class="mb-4">
                         <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
@@ -225,16 +293,16 @@
         <div id="page-admin" class="page">
             <header class="sticky top-0 z-50 bg-white shadow px-4 py-3 flex items-center justify-between">
                 <h2 class="text-lg font-semibold">Admin Dashboard</h2>
-                <button id="logout-btn" class="text-sm text-red-500 font-medium">Logout</button>
+                <button id="logout-btn" class="text-sm text-red-500 font-medium hover:text-red-700 transition-colors">Logout</button>
             </header>
             <main class="p-4 pb-20">
-                <button id="add-new-btn" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold mb-6 hover:bg-green-600 transition-colors">
+                <button id="add-new-btn" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold mb-6 shadow hover:bg-green-600 transition-colors">
                     <i class="fa-solid fa-plus mr-2"></i> Tambah Produk Baru
                 </button>
                 
-                <!-- KELOLA KATEGORI (BARU) -->
+                <!-- KELOLA KATEGORI -->
                 <h3 class="font-semibold text-gray-800 mb-3 border-t pt-4 mt-6">Kelola Kategori Produk</h3>
-                <div class="bg-gray-50 p-3 rounded-lg mb-6">
+                <div class="bg-gray-50 p-3 rounded-lg mb-6 border border-gray-200">
                     <div id="category-list-admin" class="flex flex-wrap gap-2 mb-3">
                         <!-- List kategori akan di-render di sini -->
                     </div>
@@ -242,6 +310,17 @@
                         <input type="text" id="new-category-name" placeholder="Nama Kategori Baru" class="flex-grow px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-orange-500" required>
                         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">Tambah</button>
                     </form>
+                </div>
+                
+                <!-- KELOLA PROMO CODE (BARU) -->
+                <h3 class="font-semibold text-gray-800 mb-3 border-t pt-4 mt-6">Kelola Kode Promo</h3>
+                <div class="bg-gray-50 p-3 rounded-lg mb-6 border border-gray-200">
+                    <div id="promo-list-admin" class="space-y-2 mb-3">
+                        <!-- List promo akan di-render di sini -->
+                    </div>
+                    <button id="add-promo-btn" class="w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-orange-600 transition-colors">
+                        <i class="fa-solid fa-plus mr-2"></i> Tambah Kode Promo
+                    </button>
                 </div>
 
                 <h3 class="font-semibold text-gray-800 mb-3">Daftar Produk</h3>
@@ -281,10 +360,19 @@
                         <label for="product-subtitle" class="block text-sm font-medium text-gray-700 mb-1">Sub Judul / Keterangan Singkat</label>
                         <input type="text" id="product-subtitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="Kripik Pisang Rasa Original Kripik pisang...">
                     </div>
-                    <div class="mb-4">
-                        <label for="product-price" class="block text-sm font-medium text-gray-700 mb-1">Harga (Angka)</label>
+
+                    <!-- HARGA BARU: Harga Normal (Dicoret) dan Harga Jual -->
+                    <div class="mb-4" id="price-input-group">
+                        <!-- Harga Normal (Hanya terlihat jika Promo Spesial dipilih) -->
+                        <div id="original-price-container" class="mb-4 hidden">
+                            <label for="product-original-price" class="block text-sm font-medium text-gray-700 mb-1">Harga Normal (Dicoret)</label>
+                            <input type="number" id="product-original-price" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" value="0">
+                        </div>
+                        
+                        <label for="product-price" class="block text-sm font-medium text-gray-700 mb-1">Harga Jual Saat Ini (Angka)</label>
                         <input type="number" id="product-price" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" required>
                     </div>
+
                     <!-- Input Rating -->
                     <div class="mb-4">
                         <label for="product-rating" class="block text-sm font-medium text-gray-700 mb-1">Rating (0.0 - 5.0)</label>
@@ -304,20 +392,63 @@
                 </form>
             </main>
         </div>
+        
+        <!-- ===== HALAMAN TAMBAH/EDIT PROMO CODE (BARU) ===== -->
+        <div id="page-promo-edit" class="page">
+            <header class="sticky top-0 z-50 bg-white shadow px-4 py-3 flex items-center">
+                <button class="navigate-btn text-xl" data-target="page-admin">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 id="promo-form-title" class="text-lg font-semibold ml-4">Tambah Kode Promo</h2>
+            </header>
+            <main class="p-4 pb-20">
+                <form id="promo-form">
+                    <input type="hidden" id="promo-original-code">
+                    
+                    <div class="mb-4">
+                        <label for="promo-code-input-edit" class="block text-sm font-medium text-gray-700 mb-1">Kode Promo</label>
+                        <input type="text" id="promo-code-input-edit" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors uppercase" required>
+                        <p class="text-xs text-gray-500 mt-1">Gunakan huruf kapital dan tanpa spasi.</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="promo-type-select" class="block text-sm font-medium text-gray-700 mb-1">Jenis Diskon</label>
+                        <select id="promo-type-select" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" required>
+                            <option value="percent">Persentase (%)</option>
+                            <option value="fixed">Nominal (Rp)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="promo-value-input" class="block text-sm font-medium text-gray-700 mb-1">Nilai Diskon</label>
+                        <input type="number" id="promo-value-input" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" required>
+                        <p id="promo-value-hint" class="text-xs text-gray-500 mt-1">Masukkan angka (misal: 10 untuk 10%, atau 10000 untuk Rp 10.000).</p>
+                    </div>
 
-        <!-- Bottom Navigation Bar (Diubah dari grid-cols-3 menjadi grid-cols-4) -->
+                    <div class="mb-6">
+                        <label for="promo-description-input" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi/Keterangan</label>
+                        <input type="text" id="promo-description-input" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" required>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors">Simpan Kode Promo</button>
+                </form>
+                <p id="promo-form-error" class="text-red-500 text-sm text-center mt-4"></p>
+            </main>
+        </div>
+
+        <!-- Bottom Navigation Bar -->
         <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 max-w-md w-full bg-white shadow-[0_-2px_6px_rgba(0,0,0,0.06)] border-t border-gray-200 grid grid-cols-4 z-50">
             <!-- Home -->
             <button class="nav-button-style navigate-btn text-center py-3 text-gray-600" data-target="page-home" data-default-color="text-gray-600" data-active-color="text-orange-600">
                 <i class="fa-solid fa-home text-2xl"></i>
             </button>
-            <!-- Whitelist (BARU) -->
+            <!-- Whitelist -->
             <button class="nav-button-style navigate-btn text-center py-3 text-gray-600" data-target="page-liked" data-default-color="text-gray-600" data-active-color="text-red-500">
                 <i class="fa-solid fa-heart text-2xl"></i>
             </button>
             <!-- Keranjang -->
             <button class="nav-button-style navigate-btn text-center py-3 text-gray-600" data-target="page-cart" data-default-color="text-gray-600" data-active-color="text-orange-600">
-                 <i class="fa-solid fa-shopping-basket text-2xl"></i>
+                <i class="fa-solid fa-shopping-basket text-2xl"></i>
             </button>
             <!-- Admin (User Shield) -->
             <button class="nav-button-style navigate-btn text-center py-3 text-gray-600" data-target="page-login" data-default-color="text-gray-600" data-active-color="text-orange-600">
@@ -326,31 +457,105 @@
         </nav>
     </div>
 
+    <!-- ===== FOOTER MODERN (BARU) ===== -->
+    <footer id="main-footer" class="bg-gray-800 text-gray-300 py-8 mt-16 shadow-inner w-full">
+        <div class="max-w-md mx-auto px-4">
+            <!-- Logo & Slogan -->
+            <div class="mb-6 text-center">
+                <div class="flex items-center justify-center gap-2 mb-2">
+                    <img src="https://i.ibb.co.com/n86sQs1v/Logo-Toko-Aneka-Cemilan-Snack-Ceria-Oranye-Kuning-20251105_010226_0000.png" alt="Kriuké Snack Logo" class="h-8 w-auto">
+                    <span class="text-xl font-bold text-orange-500">Kriuké Snack</span>
+                </div>
+                <p class="text-sm text-gray-400">Kriuknya Beda, Rasanya Istimewa.</p>
+            </div>
+
+            <!-- Quick Links / Informasi -->
+            <!-- Ubah grid-cols-2 statis menjadi satu kolom di mobile dan dua kolom di sm: -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-6 border-t border-gray-700 pt-6">
+                <div>
+                    <h5 class="text-md font-semibold text-white mb-3 mt-0">Informasi</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-orange-500 transition-colors">Tentang Kami</a></li>
+                        <li><a href="#" class="hover:text-orange-500 transition-colors">Kebijakan Privasi</a></li>
+                        <li><a href="#" class="hover:text-orange-500 transition-colors">Syarat & Ketentuan</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-md font-semibold text-white mb-3 mt-0">Hubungi Kami</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-green-500"></i>
+                            <a href="https://wa.me/6282349786916" target="_blank" class="hover:text-green-400">0823-4978-6916</a>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-envelope text-orange-500"></i>
+                            <a href="mailto:kriuke@snack.id" class="hover:text-orange-500">kriuke@snack.id</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Social Media Icons -->
+            <div class="flex justify-center gap-6 mt-8 border-t border-gray-700 pt-6">
+                <a href="#" class="text-2xl text-gray-400 hover:text-white transition-colors" aria-label="Instagram">
+                    <i class="fa-brands fa-instagram"></i>
+                </a>
+                <a href="#" class="text-2xl text-gray-400 hover:text-white transition-colors" aria-label="Facebook">
+                    <i class="fa-brands fa-facebook"></i>
+                </a>
+                <a href="#" class="text-2xl text-gray-400 hover:text-white transition-colors" aria-label="Twitter">
+                    <i class="fa-brands fa-twitter"></i>
+                </a>
+                <a href="#" class="text-2xl text-gray-400 hover:text-white transition-colors" aria-label="TikTok">
+                    <i class="fa-brands fa-tiktok"></i>
+                </a>
+            </div>
+
+            <!-- Copyright -->
+            <div class="text-center text-xs text-gray-500 mt-8">
+                &copy; 2025 Kriuké Snack. Hak Cipta Dilindungi.
+            </div>
+        </div>
+    </footer>
+
+
     <!-- Custom Modal for Delete Confirmation -->
     <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full">
             <h3 class="text-lg font-semibold mb-4">Konfirmasi Hapus</h3>
             <p class="text-gray-600 mb-6">Apakah Anda yakin ingin menghapus produk ini?</p>
             <div class="flex justify-end gap-3">
-                <button id="cancel-delete" class="px-4 py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300">Batal</button>
-                <button id="confirm-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700">Hapus</button>
+                <button id="cancel-delete" class="px-4 py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300 transition-colors">Batal</button>
+                <button id="confirm-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors">Hapus</button>
             </div>
         </div>
     </div>
     
-    <!-- Custom Modal for Delete Category Confirmation (BARU) -->
+    <!-- Custom Modal for Delete Category Confirmation -->
     <div id="delete-category-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full">
             <h3 class="text-lg font-semibold mb-4">Konfirmasi Hapus Kategori</h3>
-            <p class="text-gray-600 mb-6">Apakah Anda yakin ingin menghapus kategori: <span id="category-to-delete-name" class="font-bold"></span>?</p>
+            <p class="text-gray-600 mb-6">Apakah Anda yakin ingin menghapus kategori: <span id="category-to-delete-name" class="font-bold text-orange-600"></span>?</p>
             <div class="flex justify-end gap-3">
-                <button id="cancel-category-delete" class="px-4 py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300">Batal</button>
-                <button id="confirm-category-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700">Hapus</button>
+                <button id="cancel-category-delete" class="px-4 py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300 transition-colors">Batal</button>
+                <button id="confirm-category-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal for Delete Promo Confirmation (BARU) -->
+    <div id="delete-promo-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full">
+            <h3 class="text-lg font-semibold mb-4">Konfirmasi Hapus Promo</h3>
+            <p class="text-gray-600 mb-6">Apakah Anda yakin ingin menghapus kode promo: <span id="promo-to-delete-name" class="font-bold text-orange-600"></span>?</p>
+            <div class="flex justify-end gap-3">
+                <button id="cancel-promo-delete" class="px-4 py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300 transition-colors">Batal</button>
+                <button id="confirm-promo-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors">Hapus</button>
             </div>
         </div>
     </div>
     
-    <!-- Off-Canvas Menu (BARU) -->
+    <!-- Off-Canvas Menu -->
     <div id="off-canvas-menu" class="fixed inset-0 z-[100] hidden">
         <!-- Overlay -->
         <div id="menu-overlay" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity opacity-0"></div>
@@ -403,7 +608,7 @@
             // === STATE & KONSTANTA ===
             let products = [];
             let cart = [];
-            let categories = []; // BARU
+            let categories = [];
             let isLoggedIn = false;
             let activeCategory = 'Semua';
             let likedProducts = JSON.parse(localStorage.getItem('kriuke_liked') || '[]');
@@ -411,7 +616,13 @@
             const ADMIN_PASS = 'kriuke123';
             const WHATSAPP_NUMBER = '6282349786916';
             let productToDeleteId = null;
-            let categoryToDelete = null; // BARU
+            let categoryToDelete = null;
+            
+            // --- Logika Kode Promo ---
+            let appliedPromo = null; // Menyimpan *kunci* promo yang diterapkan
+            let promoCodes = {}; // Akan diinisialisasi dari localStorage
+            let promoCodeToDelete = null;
+            // ---------------------------------
 
             // === REFERENSI DOM ===
             const pages = document.querySelectorAll('.page');
@@ -428,10 +639,14 @@
             const formTitle = document.getElementById('form-title');
             const productIdInput = document.getElementById('product-id');
             const productNameInput = document.getElementById('product-name');
-            // Ganti referensi dari input teks ke select
             const productCategorySelect = document.getElementById('product-category-select'); 
             const productSubtitleInput = document.getElementById('product-subtitle');
+            
+            // Referensi HARGA
+            const originalPriceContainer = document.getElementById('original-price-container'); // BARU
+            const productOriginalPriceInput = document.getElementById('product-original-price'); // BARU
             const productPriceInput = document.getElementById('product-price');
+            
             const productRatingInput = document.getElementById('product-rating');
             const productImagesInput = document.getElementById('product-images');
             const productDescInput = document.getElementById('product-description');
@@ -441,13 +656,27 @@
             const cartIconBtn = document.getElementById('cart-icon-btn');
             const cartCountBadge = document.getElementById('cart-count-badge');
             const cartItemsContainer = document.getElementById('cart-items-container');
-            const cartTotalEl = document.getElementById('cart-total');
             const checkoutWaBtn = document.getElementById('checkout-wa-btn');
             const toastNotification = document.getElementById('toast-notification');
 
+            // --- Referensi Promo & Total Keranjang ---
+            const promoCodeInput = document.getElementById('promo-code-input');
+            const applyPromoBtn = document.getElementById('apply-promo-btn');
+            const promoStatusText = document.getElementById('promo-status-text');
+            const cartSubtotalEl = document.getElementById('cart-subtotal');
+            const promoDiscountRow = document.getElementById('promo-discount-row');
+            const cartPromoDiscountEl = document.getElementById('cart-promo-discount');
+            const cartTotalEl = document.getElementById('cart-total');
+            // ----------------------------------------------------
+
             // Referensi Halaman Checkout
             const checkoutForm = document.getElementById('checkout-form');
+            // --- Referensi Total Checkout ---
+            const checkoutPageSubtotalEl = document.getElementById('checkout-page-subtotal');
+            const checkoutPromoDiscountRow = document.getElementById('checkout-promo-discount-row');
+            const checkoutPagePromoDiscountEl = document.getElementById('checkout-page-promo-discount');
             const checkoutPageTotalEl = document.getElementById('checkout-page-total');
+            // ------------------------------------------
             const checkoutError = document.getElementById('checkout-error');
 
             // Referensi Halaman Liked
@@ -460,7 +689,7 @@
             const menuDrawer = document.getElementById('menu-drawer');
             const menuCloseBtn = document.getElementById('menu-close-btn');
 
-            // Referensi Admin Kategori (BARU)
+            // Referensi Admin Kategori
             const addCategoryForm = document.getElementById('add-category-form');
             const newCategoryNameInput = document.getElementById('new-category-name');
             const categoryListAdmin = document.getElementById('category-list-admin');
@@ -469,16 +698,35 @@
             const cancelCategoryDeleteBtn = document.getElementById('cancel-category-delete');
             const confirmCategoryDeleteBtn = document.getElementById('confirm-category-delete');
 
-            // Referensi Modal Hapus Produk (DIPINDAHKAN KE SINI)
+            // Referensi Modal Hapus Produk
             const deleteModal = document.getElementById('delete-modal');
             const cancelDeleteBtn = document.getElementById('cancel-delete');
             const confirmDeleteBtn = document.getElementById('confirm-delete');
+            
+            // --- Referensi Admin Promo Code ---
+            const addPromoBtn = document.getElementById('add-promo-btn');
+            const promoForm = document.getElementById('promo-form');
+            const promoFormTitle = document.getElementById('promo-form-title');
+            const promoOriginalCodeInput = document.getElementById('promo-original-code');
+            const promoCodeInputEdit = document.getElementById('promo-code-input-edit');
+            const promoTypeSelect = document.getElementById('promo-type-select');
+            const promoValueInput = document.getElementById('promo-value-input');
+            const promoDescriptionInput = document.getElementById('promo-description-input');
+            const promoFormError = document.getElementById('promo-form-error');
+            const promoListAdmin = document.getElementById('promo-list-admin');
+            const promoValueHint = document.getElementById('promo-value-hint');
+            
+            // Referensi Modal Hapus Promo
+            const deletePromoModal = document.getElementById('delete-promo-modal');
+            const promoToDeleteNameEl = document.getElementById('promo-to-delete-name');
+            const cancelPromoDeleteBtn = document.getElementById('cancel-promo-delete');
+            const confirmPromoDeleteBtn = document.getElementById('confirm-promo-delete');
 
 
             // === FUNGSI UTILITAS ===
 
             function formatRupiah(angka) {
-                return new Intl.NumberFormat('id-ID').format(angka);
+                return new Intl.NumberFormat('id-ID').format(Math.round(angka));
             }
 
             function showToast(message) {
@@ -489,17 +737,17 @@
                 }, 2000);
             }
 
-            // Fungsi Share utama (masih dibutuhkan oleh card)
-            let isSharing = false; // State untuk mencegah double-tap share
+            // Fungsi Share utama
+            let isSharing = false; 
 
             async function handleShare(productName) {
-                if (isSharing) return; // Mencegah panggilan ganda
+                if (isSharing) return;
 
                 const url = window.location.href;
                 const text = `Cek produk keren ini: ${productName} dari Kriuké Snack! Kriuknya Beda, Rasanya Istimewa.`;
 
                 if (navigator.share) {
-                    isSharing = true; // Set flag sebelum memanggil native API
+                    isSharing = true; 
                     try {
                         await navigator.share({
                             title: `Kriuké Snack - ${productName}`,
@@ -508,33 +756,47 @@
                         });
                     } catch (error) {
                         console.error('Error sharing:', error);
-                        // AbortError is fine (user dismissed the share dialog)
                     } finally {
-                        isSharing = false; // Reset flag setelah operasi selesai (berhasil/gagal/dibatalkan)
+                        isSharing = false;
                     }
                 } else {
-                    // Fallback to clipboard when navigator.share is not available
-                    navigator.clipboard.writeText(`${text} ${url}`).then(() => {
+                    // Fallback for copying to clipboard
+                    const textToCopy = `${text} ${url}`;
+                    try {
+                        await navigator.clipboard.writeText(textToCopy);
                         showToast('Link berhasil disalin ke clipboard!');
-                    }).catch(err => {
-                        console.error('Could not copy text: ', err);
-                        // Fallback lama jika clipboard API gagal
+                    } catch (err) {
+                         // Older execCommand fallback
                         const dummy = document.createElement('textarea');
                         document.body.appendChild(dummy);
-                        dummy.value = `${text} ${url}`;
+                        dummy.value = textToCopy;
                         dummy.select();
                         document.execCommand('copy');
                         document.body.removeChild(dummy);
                         showToast('Link berhasil disalin ke clipboard!');
-                    });
+                    }
                 }
             }
             
-            async function handleShareFromCard(id, name) {
-                 handleShare(name);
+            function handleShareFromCard(id, name) {
+                handleShare(name);
             }
             
-            // Fungsi inti penambahan ke keranjang (DIPINDAHKAN KE ATAS)
+            // FUNGSI BARU: Langsung buat pesan WA untuk produk tunggal di kartu
+            function handleBuySingleWa(id) {
+                const product = products.find(p => p.id === id);
+                if (!product) return;
+
+                const message = encodeURIComponent(
+                    `Halo Kriuké Snack, saya ingin memesan 1x *${product.name.toUpperCase()}* (Rp${formatRupiah(product.price)}). Mohon konfirmasi pesanan saya. Terima kasih!`
+                );
+                
+                const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+                window.open(waUrl, '_blank');
+            }
+
+
+            // Fungsi inti penambahan ke keranjang
             function handleCartAddition(id, quantity) {
                 const product = products.find(p => p.id === id);
                 if (!product) return;
@@ -548,14 +810,20 @@
 
                 saveCart();
                 updateCartBadge();
-                showToast(`${product.name} ditambahkan ke keranjang!`);
+                // Perbarui total jika sedang di halaman keranjang/checkout
+                const activePageId = document.querySelector('.page.active').id;
+                if (activePageId === 'page-cart') {
+                    renderCartPage();
+                } else if (activePageId === 'page-checkout') {
+                    renderCheckoutPage();
+                }
+                showToast(`${product.name.toUpperCase()} ditambahkan ke keranjang!`);
             }
             
-            // FUNGSI MENU TOGGLE (BARU)
+            // FUNGSI MENU TOGGLE
             function toggleMenu(show) {
                 if (show) {
                     offCanvasMenu.classList.remove('hidden');
-                    // Menggunakan setTimeout untuk memicu transisi setelah 'display: block'
                     setTimeout(() => {
                         menuOverlay.classList.remove('opacity-0');
                         menuDrawer.classList.remove('translate-x-full');
@@ -563,7 +831,6 @@
                 } else {
                     menuOverlay.classList.add('opacity-0');
                     menuDrawer.classList.add('translate-x-full');
-                    // Tunggu transisi selesai sebelum menyembunyikan kontainer
                     setTimeout(() => {
                         offCanvasMenu.classList.add('hidden');
                     }, 300); 
@@ -573,50 +840,47 @@
 
             // FUNGSI NAVIGASI
             function navigate(pageId) {
-                // Sembunyikan semua halaman
                 pages.forEach(page => page.classList.remove('active'));
                 
-                // Tampilkan halaman yang dituju
                 const targetPage = document.getElementById(pageId);
                 if (targetPage) {
                     targetPage.classList.add('active');
-                    window.scrollTo(0, 0); // Scroll ke atas
+                    window.scrollTo(0, 0);
                 }
                 
-                // Panggil fungsi render khusus
                 if (pageId === 'page-cart') {
                     renderCartPage();
                 } else if (pageId === 'page-checkout') {
                     renderCheckoutPage();
                 } else if (pageId === 'page-liked') {
                     renderLikedPage();
-                } else if (pageId === 'page-admin') { // BARU: Render list kategori saat ke admin
+                } else if (pageId === 'page-admin') {
                     renderAdminCategoryList();
+                    renderAdminPromoList(); 
                     renderAdminList();
                 }
 
-                // Update status aktif tombol navigasi bawah
+                // Update status tombol navigasi bawah
                 navButtons.forEach(btn => {
                     const target = btn.dataset.target;
                     const isActivePage = (target === pageId) || 
-                                         (target === 'page-login' && (pageId === 'page-admin' || pageId === 'page-edit')) ||
-                                         (target === 'page-cart' && pageId === 'page-checkout') ||
-                                         (target === 'page-liked' && pageId === 'page-liked'); 
+                                         (target === 'page-login' && (pageId === 'page-admin' || pageId === 'page-edit' || pageId === 'page-promo-edit')) ||
+                                         (target === 'page-cart' && pageId === 'page-checkout'); 
 
-                    // Hapus semua warna, lalu tambahkan warna aktif/default
+                    // Hapus semua warna aktif
                     btn.classList.remove('text-orange-600', 'text-gray-600', 'text-red-500');
                     if (isActivePage) {
-                        if (target === 'page-liked') {
-                            btn.classList.add('text-red-500');
-                        } else {
-                            btn.classList.add('text-orange-600'); 
-                        }
+                        // Terapkan warna aktif spesifik
+                        const activeColor = btn.dataset.activeColor || 'text-orange-600';
+                        btn.classList.add(activeColor);
                     } else {
-                        btn.classList.add('text-gray-600'); 
+                        // Terapkan warna default
+                        const defaultColor = btn.dataset.defaultColor || 'text-gray-600';
+                        btn.classList.add(defaultColor);
                     }
                 });
 
-                // Update status ikon keranjang di header Home/Detail
+                // Update status ikon keranjang di header
                 if (pageId === 'page-cart' || pageId === 'page-checkout') {
                     cartIconBtn.classList.add('text-orange-600');
                     cartIconBtn.classList.remove('text-gray-700');
@@ -631,7 +895,6 @@
                 const product = products.find(p => p.id === id);
                 if (!product) return;
                 
-                // 1. Build thumbnail HTML
                 let thumbnailHTML = '';
                 product.images.forEach((img, index) => {
                     thumbnailHTML += `
@@ -639,20 +902,14 @@
                     `;
                 });
 
-                // 2. Build Action Buttons HTML (dipindahkan ke dalam konten)
                 const actionButtonsHTML = `
                     <div class="flex items-center gap-2 mt-6 p-4 border-t border-gray-200 -mx-4">
-                        <!-- Tombol Bagikan -->
                         <button id="detail-share-btn" data-id="${product.id}" data-name="${product.name}" class="bg-white text-gray-600 w-12 h-12 rounded-lg flex items-center justify-center text-xl shadow-sm hover:bg-gray-100 transition-colors border border-gray-300">
                             <i class="fa-solid fa-share-alt"></i>
                         </button>
-
-                        <!-- Tombol Tambah ke Keranjang -->
                         <button id="detail-add-to-cart-btn" data-id="${product.id}" class="bg-orange-100 text-orange-600 w-12 h-12 rounded-lg flex items-center justify-center text-xl shadow-sm hover:bg-orange-200 transition-colors border border-orange-600">
                             <i class="fa-solid fa-shopping-cart"></i>
                         </button>
-                        
-                        <!-- Tombol Beli via WhatsApp (Besar) -->
                         <button id="detail-buy-wa-btn" data-id="${product.id}" data-name="${product.name}" class="flex-grow bg-green-500 text-white h-12 px-6 rounded-lg flex items-center justify-center font-semibold shadow-lg hover:bg-green-600 transition-colors">
                             <i class="fa-brands fa-whatsapp mr-2 text-xl"></i>
                             Beli via WhatsApp
@@ -660,19 +917,15 @@
                     </div>
                 `;
 
-                // 3. Set content
                 detailContent.innerHTML = `
-                    <!-- Main Image -->
                     <img id="main-product-image" src="${product.images[0]}" alt="${product.name}" class="w-full h-80 object-cover" onerror="this.src='https://placehold.co/400x256/FFECB3/000000?text=Error'">
                     
-                    <!-- Thumbnails -->
                     <div class="flex gap-2 p-4 overflow-x-auto">
                         ${thumbnailHTML}
                     </div>
 
                     <div class="p-4 pt-0">
                         <h2 class="text-2xl font-bold text-gray-900 capitalize">${product.name}</h2>
-                        <!-- Kontainer Harga & Rating (Diubah) -->
                         <div class="flex items-center justify-between my-2">
                             <p class="text-3xl font-bold text-red-600">Rp${formatRupiah(product.price)}</p>
                             <div class="flex items-center gap-1 text-lg">
@@ -684,7 +937,6 @@
                         <h3 class="text-lg font-semibold mt-6 mb-2">Deskripsi Produk</h3>
                         <p class="text-gray-700 whitespace-pre-wrap mb-6">${product.description}</p>
 
-                        <!-- Link E-commerce -->
                         <h4 class="font-semibold text-gray-800 mb-2 mt-5 text-sm">Beli di E-commerce:</h4>
                         <div class="grid grid-cols-4 gap-3 text-center mb-6"> 
                             <a href="#" class="block p-3 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -705,15 +957,12 @@
                             </a>
                         </div>
                         
-                        <!-- Action Buttons (Disisipkan di sini) -->
                         ${actionButtonsHTML}
                         
                     </div>
                 `;
                 
-                // 4. Add event listeners
-                
-                // Thumbnail changer
+                // Add event listeners
                 detailContent.querySelectorAll('.thumbnail-img').forEach(thumb => {
                     thumb.addEventListener('click', (e) => {
                         const newSrc = e.currentTarget.dataset.imgSrc;
@@ -723,7 +972,6 @@
                     });
                 });
                 
-                // Action buttons listeners
                 document.getElementById('detail-share-btn').addEventListener('click', (e) => {
                     const name = e.currentTarget.dataset.name;
                     handleShare(name);
@@ -739,9 +987,7 @@
                 navigate('page-detail');
             }
             
-            // FUNGSI BARU: Handle Beli via WA (Detail Page)
             function handleBuyViaWa(e) {
-                // Ambil data dari tombol yang diklik (yang ada di konten detail)
                 const id = e.currentTarget.dataset.id;
                 const name = e.currentTarget.dataset.name;
                 const product = products.find(p => p.id === id);
@@ -749,7 +995,7 @@
                 if (!product) return;
 
                 const message = encodeURIComponent(
-                    `Halo Kriuké Snack, saya ingin memesan 1x *${name}* (Rp${formatRupiah(product.price)}). Mohon konfirmasi pesanan saya. Terima kasih!`
+                    `Halo Kriuké Snack, saya ingin memesan 1x *${name.toUpperCase()}* (Rp${formatRupiah(product.price)}). Mohon konfirmasi pesanan saya. Terima kasih!`
                 );
                 
                 const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
@@ -763,37 +1009,33 @@
 
             function handleToggleLike(id) {
                 const index = likedProducts.indexOf(id);
-                const button = document.querySelector(`.like-btn[data-id="${id}"] i`);
+                const buttons = document.querySelectorAll(`.like-btn[data-id="${id}"] i`);
                 
                 if (index > -1) {
-                    // Unlike
                     likedProducts.splice(index, 1);
-                    if(button) {
-                        button.classList.remove('fa-solid', 'text-red-500');
-                        button.classList.add('fa-regular', 'text-gray-300');
-                    }
+                    buttons.forEach(button => {
+                         button.classList.remove('fa-solid', 'text-red-500');
+                         button.classList.add('fa-regular', 'text-gray-300');
+                    });
                     showToast('Produk dihapus dari favorit.');
                 } else {
-                    // Like
                     likedProducts.push(id);
-                    if(button) {
+                    buttons.forEach(button => {
                         button.classList.remove('fa-regular', 'text-gray-300');
                         button.classList.add('fa-solid', 'text-red-500');
-                    }
+                    });
                     showToast('Produk ditambahkan ke favorit!');
                 }
                 saveLikedProducts();
                 
-                // Jika sedang di halaman liked, re-render setelah unlike
                 if (document.getElementById('page-liked').classList.contains('active')) {
                     renderLikedPage();
                 }
             }
             
-            // FUNGSI BARU: Render Halaman Whitelist
             function renderLikedPage() {
                 likedItemsContainer.innerHTML = '';
-                // Filter produk yang ada di likedProducts
+                // Filter produk yang datanya masih ada
                 const likedProductsData = products.filter(p => likedProducts.includes(p.id));
 
                 if (likedProductsData.length === 0) {
@@ -814,15 +1056,12 @@
                     const productCard = document.createElement('div');
                     productCard.className = 'bg-white rounded-lg shadow-md overflow-hidden';
                     
-                    // Struktur kartu yang dioptimalkan untuk halaman liked
                     productCard.innerHTML = `
                         <div class="relative cursor-pointer" data-id="${product.id}">
-                            <!-- Product Image -->
                             <img src="${product.images[0]}" alt="${product.name}" class="w-full aspect-square object-cover" 
                                 onerror="this.src='https://placehold.co/100x100/FEE300/000000?text=Kriuké'">
                             
-                            <!-- Remove from Whitelist Button (Solid red, calls handleToggleLike) -->
-                            <button data-id="${product.id}" class="unlike-btn absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:scale-105 transition-transform z-10">
+                            <button data-id="${product.id}" class="like-btn absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:scale-105 transition-transform z-10">
                                 <i class="fa-solid fa-heart text-red-500 text-xl"></i>
                             </button>
                         </div>
@@ -843,7 +1082,6 @@
 
                     productCard.querySelector('.unlike-btn').addEventListener('click', (e) => {
                         e.stopPropagation();
-                        // Memanggil handleToggleLike akan menghapus dari list dan auto-re-render halaman ini
                         handleToggleLike(product.id);
                     });
                     
@@ -860,94 +1098,116 @@
             function renderHomeProducts(filterCategory = 'Semua') {
                 productGrid.innerHTML = '';
 
-                // Filter produk berdasarkan kategori
-                const filteredProducts = (filterCategory === 'Semua')
-                    ? products
-                    : products.filter(p => p.category === filterCategory);
-
+                let filteredProducts = products.filter(p => {
+                    const searchInput = document.getElementById('search-input').value.toLowerCase().trim();
+                    const matchesCategory = (filterCategory === 'Semua') ? true : p.category === filterCategory;
+                    const matchesSearch = p.name.toLowerCase().includes(searchInput) || 
+                                          p.subtitle.toLowerCase().includes(searchInput) || 
+                                          p.description.toLowerCase().includes(searchInput);
+                    return matchesCategory && matchesSearch;
+                });
+                
                 if (filteredProducts.length === 0) {
-                    productGrid.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-10">Tidak ada produk untuk kategori ini.</p>';
+                    const searchInput = document.getElementById('search-input').value.trim();
+                    const message = searchInput
+                        ? `Tidak ada produk ditemukan untuk: "${searchInput}" di kategori ${filterCategory}.`
+                        : `Tidak ada produk untuk kategori ini.`;
+
+                    productGrid.innerHTML = `<p class="text-gray-500 col-span-2 text-center py-10 px-4">${message}</p>`;
                     return;
                 }
                 
                 filteredProducts.forEach(product => {
-                    // Cek status like
                     const isLiked = likedProducts.includes(product.id);
-                    const likeIconClass = isLiked ? 'fa-solid text-red-500' : 'fa-regular text-gray-300'; // Menggunakan fa-regular untuk non-aktif
+                    const likeIconClass = isLiked ? 'fa-solid text-red-500' : 'fa-regular text-gray-300';
+                    const totalSold = Math.floor(Math.random() * 500) + 100; // Contoh data acak
                     
+                    // Logic untuk menampilkan harga dicoret
+                    const showOriginalPrice = product.originalPrice && product.originalPrice > product.price;
+                    const originalPriceHTML = showOriginalPrice
+                        ? `<span class="text-sm text-gray-500 line-through mr-2">Rp${formatRupiah(product.originalPrice)}</span>`
+                        : '';
+
+
                     const productCard = document.createElement('div');
-                    productCard.className = 'bg-white rounded-lg shadow-md overflow-hidden';
+                    productCard.className = 'bg-white rounded-lg shadow-md overflow-hidden transform transition-transform duration-150 hover:shadow-lg';
                     
-                    // --- Kartu Produk (Sesuai Gambar) ---
                     productCard.innerHTML = `
                         <div class="relative cursor-pointer" data-id="${product.id}">
-                            <!-- Product Image -->
                             <img src="${product.images[0]}" alt="${product.name}" class="w-full aspect-square object-cover" 
-                                onerror="this.src='https://placehold.co/100x100/FFECB3/000000?text=Kriuké'">
+                                onerror="this.src='https://placehold.co/100x100/FEE300/000000?text=Kriuké'">
                             
-                            <!-- Like Button -->
                             <button data-id="${product.id}" class="like-btn absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:scale-105 transition-transform z-10">
                                 <i class="${likeIconClass} fa-heart text-xl"></i>
                             </button>
                         </div>
                         <div class="p-3">
-                            <!-- Category/Promo Badge (BARU) -->
-                            <p class="text-xs ${product.category === 'Promo Spesial' ? 'text-red-500 font-bold' : 'text-gray-500'} mb-1 capitalize">${product.category}</p>
+                            <!-- BARIS KATEGORI, RATING, DAN TERJUAL -->
+                            <div class="flex items-center justify-between mb-1">
+                                <p class="text-xs ${product.category === 'Promo Spesial' ? 'text-red-500 font-bold' : 'text-gray-500'} capitalize">${product.category}</p>
+                                <div class="flex items-center gap-1 text-xs">
+                                    <i class="fa-solid fa-star text-yellow-400"></i>
+                                    <span class="font-medium text-gray-700">${product.rating}</span>
+                                    <span class="text-gray-500 ml-1">(${formatRupiah(totalSold)} terjual)</span>
+                                </div>
+                            </div>
                             
-                            <!-- Product Name (Bold, Sesuai gambar) -->
                             <h4 class="text-base font-semibold text-gray-800 capitalize">${product.name}</h4>
                             
-                            <!-- Description/Sub-Title (Sesuai gambar) -->
                             <p class="text-sm text-gray-600 mb-2 whitespace-nowrap overflow-hidden text-ellipsis">${product.subtitle || product.description.substring(0, 30) + '...'}</p>
                             
-                            <!-- Price (Besar dan Merah/Orange) -->
-                            <p class="text-xl font-bold text-red-600 mb-3">Rp${formatRupiah(product.price)}</p>
+                            <!-- BARIS HARGA: HARGA NORMAL DICORET DAN HARGA JUAL -->
+                            <div class="flex items-baseline mb-3">
+                                ${originalPriceHTML}
+                                <p class="text-xl font-bold text-red-600">Rp${formatRupiah(product.price)}</p>
+                            </div>
 
-                            <!-- Action Buttons (Share and Cart) -->
+                            <!-- BARIS TOMBOL AKSI: DIRAPIKAN MENJADI 3 BAGIAN SAMA BESAR -->
                             <div class="flex gap-2">
-                                <!-- Share Button (Left) -->
-                                <button data-id="${product.id}" data-name="${product.name}" class="share-card-btn w-1/4 p-2 bg-white border border-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-100 transition-colors flex items-center justify-center">
-                                    <i class="fa-solid fa-share-alt text-lg"></i>
+                                <button data-id="${product.id}" data-name="${product.name}" class="share-card-btn w-1/3 p-2 bg-white border border-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-100 transition-colors flex items-center justify-center text-xl">
+                                    <i class="fa-solid fa-share-alt"></i>
                                 </button>
-                                <!-- Add to Cart Button (Right) -->
-                                <button data-id="${product.id}" class="add-to-cart-card-btn w-3/4 p-2 bg-orange-600 text-white rounded-lg shadow-md hover:bg-orange-700 transition-colors flex items-center justify-center">
-                                    <i class="fa-solid fa-shopping-cart text-lg"></i>
+                                <button data-id="${product.id}" class="add-to-cart-card-btn w-1/3 p-2 bg-orange-600 text-white rounded-lg shadow-md hover:bg-orange-700 transition-colors flex items-center justify-center text-xl">
+                                    <i class="fa-solid fa-shopping-cart"></i>
+                                </button>
+                                <button data-id="${product.id}" class="buy-single-wa-btn w-1/3 p-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition-colors flex items-center justify-center text-xl">
+                                    <i class="fa-brands fa-whatsapp"></i>
                                 </button>
                             </div>
                         </div>
                     `;
                     
-                    // Event listener untuk klik kartu (masuk ke detail)
                     productCard.querySelector('.relative').addEventListener('click', () => showProductDetail(product.id));
 
-                    // Event listener untuk tombol Like
                     productCard.querySelector('.like-btn').addEventListener('click', (e) => {
-                        e.stopPropagation(); // Mencegah klik kartu saat klik tombol like
+                        e.stopPropagation();
                         handleToggleLike(product.id);
                     });
 
-                    // Event listener untuk tombol Share di card
                     productCard.querySelector('.share-card-btn').addEventListener('click', (e) => {
-                         e.stopPropagation();
-                         handleShareFromCard(product.id, product.name);
+                        e.stopPropagation();
+                        handleShareFromCard(product.id, product.name);
                     });
                     
-                    // Event listener untuk tombol Add to Cart di card
                     productCard.querySelector('.add-to-cart-card-btn').addEventListener('click', (e) => {
                         e.stopPropagation();
-                        handleAddToCartFromCard(product.id);
+                        handleCartAddition(product.id, 1);
                     });
                     
+                    // Event listener untuk tombol WhatsApp baru
+                    productCard.querySelector('.buy-single-wa-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        handleBuySingleWa(product.id);
+                    });
+
                     productGrid.appendChild(productCard);
                 });
             }
 
-            // FUNGSI BARU: Render Filter Kategori (Diubah gayanya)
             function renderCategoryFilters() {
-                // Gunakan daftar kategori yang disimpan
-                const baseCategories = ['Semua']; 
-                // Pastikan categories sudah dimuat, jika tidak, gunakan daftar default/semua yang ada di produk
-                const uniqueCategories = [...new Set([...baseCategories, ...categories])];
+                const productCategories = products.map(p => p.category).filter(c => c); // Ambil semua kategori dari produk
+                const allCategories = ['Semua', ...categories]; // Gunakan state categories + 'Semua'
+                const uniqueCategories = [...new Set(allCategories)]; // Pastikan unik
                 
                 categoryFilterContainer.innerHTML = ''; 
 
@@ -958,19 +1218,17 @@
                     
                     let styleClass;
                     if (category === activeCategory) {
-                        // Gaya tombol aktif (solid orange)
                         styleClass = 'bg-orange-600 text-white border-orange-600 shadow-md';
                     } else {
-                        // Gaya tombol non-aktif (white, gray border)
                         styleClass = 'bg-white text-gray-700 border-gray-300 shadow-sm';
                     }
 
                     button.className = `${styleClass} px-4 py-2 rounded-full text-sm font-medium border transition-colors whitespace-nowrap hover:shadow-md hover:border-orange-500`;
                     
                     button.addEventListener('click', () => {
-                        activeCategory = category; // Set state
-                        renderCategoryFilters(); // Re-render filter (untuk update style)
-                        renderHomeProducts(activeCategory); // Re-render produk
+                        activeCategory = category;
+                        renderCategoryFilters();
+                        renderHomeProducts(activeCategory);
                     });
                     
                     categoryFilterContainer.appendChild(button);
@@ -978,15 +1236,14 @@
             }
 
 
-            // === FUNGSI KATEGORI ADMIN (BARU) ===
+            // === FUNGSI KATEGORI ADMIN ===
 
             function loadCategories() {
                 const storedCategories = localStorage.getItem('kriuke_categories');
                 if (storedCategories) {
                     categories = JSON.parse(storedCategories);
                 } else {
-                    // Set kategori default jika belum ada
-                    categories = ['Keripik Pisang', 'Promo Spesial', 'Manis', 'Gurih', 'Pedas'];
+                    categories = ['Keripik Pisang', 'Promo Spesial', 'Manis', 'Gurih', 'Pedas', 'Lainnya'];
                     saveCategories();
                 }
             }
@@ -1007,40 +1264,48 @@
                     newCategoryNameInput.value = '';
                     showToast(`Kategori "${newCategory}" berhasil ditambahkan.`);
                 } else if (categories.includes(newCategory)) {
-                     showToast(`Kategori "${newCategory}" sudah ada!`);
+                    showToast(`Kategori "${newCategory}" sudah ada!`);
                 }
             }
-
+            
+            // FUNGSI UNTUK MENAMPILKAN MODAL HAPUS KATEGORI
             function showCategoryDeleteConfirmation(category) {
+                // Kategori default yang dilindungi
+                const defaultCategories = ['Semua', 'Keripik Pisang', 'Promo Spesial', 'Manis', 'Gurih', 'Pedas', 'Lainnya'];
+                if (defaultCategories.includes(category)) {
+                     showToast(`Kategori default "${category}" tidak dapat dihapus.`);
+                     return;
+                }
                 categoryToDelete = category;
                 categoryToDeleteNameEl.textContent = category;
                 deleteCategoryModal.classList.remove('hidden');
             }
 
+            // FUNGSI UNTUK MELAKUKAN HAPUS KATEGORI
             function handleDeleteCategory() {
                 if (!categoryToDelete) return;
                 
-                // Hapus kategori dari list
-                categories = categories.filter(c => c !== categoryToDelete);
+                const deletedCategory = categoryToDelete;
+                categories = categories.filter(c => c !== deletedCategory);
                 saveCategories();
 
-                // Ubah kategori produk yang menggunakan kategori yang dihapus menjadi 'Lainnya'
+                // Pindahkan produk yang kehilangan kategori ke kategori 'Lainnya'
                 products.forEach(p => {
-                    if (p.category === categoryToDelete) {
+                    if (p.category === deletedCategory) {
                         p.category = 'Lainnya';
                     }
                 });
                 saveProducts();
                 
-                // Reset state & render ulang
+                // Render ulang semua yang terkait
                 renderAdminCategoryList();
                 renderCategoryFilters();
                 renderAdminList();
                 deleteCategoryModal.classList.add('hidden');
-                showToast(`Kategori "${categoryToDelete}" berhasil dihapus.`);
+                showToast(`Kategori "${deletedCategory}" berhasil dihapus.`);
                 categoryToDelete = null;
             }
-
+            
             function renderAdminCategoryList() {
                 categoryListAdmin.innerHTML = '';
                 
@@ -1050,13 +1315,15 @@
                 }
 
                 categories.forEach(category => {
+                    const isDefault = ['Keripik Pisang', 'Promo Spesial', 'Manis', 'Gurih', 'Pedas', 'Lainnya'].includes(category);
                     const item = document.createElement('div');
                     item.className = 'flex items-center bg-white border rounded-full pl-3 pr-2 py-1 shadow-sm';
                     item.innerHTML = `
                         <span class="text-sm font-medium text-gray-700">${category}</span>
+                        ${!isDefault ? `
                         <button data-category="${category}" class="delete-category-btn ml-2 p-1 text-red-500 hover:text-red-700">
                             <i class="fa-solid fa-times text-xs"></i>
-                        </button>
+                        </button>` : ''}
                     `;
                     categoryListAdmin.appendChild(item);
                 });
@@ -1069,14 +1336,10 @@
                 });
             }
             
-            // FUNGSI BARU: Render Opsi Kategori di Form Produk
             function renderCategoryOptions(selectedCategory = '') {
                 productCategorySelect.innerHTML = '';
                 
-                // Tambahkan opsi 'Lainnya' jika belum ada
-                const allCategories = categories.includes('Lainnya') ? categories : [...categories, 'Lainnya'];
-                
-                allCategories.forEach(category => {
+                categories.forEach(category => {
                     const option = document.createElement('option');
                     option.value = category;
                     option.textContent = category;
@@ -1085,21 +1348,24 @@
                     }
                     productCategorySelect.appendChild(option);
                 });
+                
+                // Panggil toggle visibility setelah options di-render
+                toggleOriginalPriceInput(selectedCategory);
             }
 
 
-            // === FUNGSI DATA & ADMIN ===
+            // === FUNGSI DATA & ADMIN PRODUK ===
             function loadProducts() {
                 const storedProducts = localStorage.getItem('kriuke_products');
                 if (storedProducts) {
                     products = JSON.parse(storedProducts);
                 } else {
-                    // Data awal (Diperbarui menjadi 6 produk)
+                    // Data awal (p2 ditambahkan originalPrice)
                     products = [
                         {
                             id: 'p1',
                             name: 'kripik pisang rasa original',
-                            subtitle: 'Kripik Pisang Rasa Original Kripik pisang...',
+                            subtitle: 'Gurih alami, kriuknya beda.',
                             price: 25000,
                             rating: 4.8,
                             category: 'Keripik Pisang',
@@ -1113,10 +1379,11 @@
                         {
                             id: 'p2',
                             name: 'kriuke rasa coklat',
-                            subtitle: 'Kripik Pisang Rasa Coklat Kripik pisang...',
-                            price: 20000, // Harga Promo
+                            subtitle: 'Promo Spesial: lumer coklat premium.',
+                            price: 20000, 
+                            originalPrice: 28000, // Harga normal ditambahkan
                             rating: 4.7,
-                            category: 'Promo Spesial', // Diubah
+                            category: 'Promo Spesial', 
                             images: [
                                 'https://placehold.co/300x300/795548/FFFFFF?text=Coklat+Pack',
                                 'https://placehold.co/300x300/795548/FFFFFF?text=Coklat+Detail'
@@ -1127,10 +1394,10 @@
                         {
                             id: 'p3',
                             name: 'kripik pisang rasa balado',
-                            subtitle: 'Kripik Pisang Rasa Balado Kripik pisang...',
+                            subtitle: 'Pedas manis bumbu balado khas.',
                             price: 18000,
                             rating: 4.5,
-                            category: 'Pedas', // Diubah
+                            category: 'Pedas', 
                             images: [
                                 'https://placehold.co/300x300/F44336/FFFFFF?text=Balado+Pack'
                             ],
@@ -1139,11 +1406,11 @@
                         },
                         {
                             id: 'p4',
-                            name: 'rasa manis pedas manis',
-                            subtitle: 'Kripik Pisang Rasa Pedas Manis Kripik pisang...',
+                            name: 'kriuke rasa pedas manis',
+                            subtitle: 'Manis gula aren dan sensasi pedas hangat.',
                             price: 19000,
                             rating: 4.9,
-                            category: 'Manis', // Diubah
+                            category: 'Manis', 
                             images: [
                                 'https://placehold.co/300x300/D32F2F/FFFFFF?text=Pedas+Manis+Pack'
                             ],
@@ -1153,7 +1420,7 @@
                         {
                             id: 'p5',
                             name: 'kripik pisang rasa matcha',
-                            subtitle: 'Kriuké dengan bubuk matcha asli Jepang...',
+                            subtitle: 'Untuk pecinta teh hijau Jepang.',
                             price: 22000,
                             rating: 4.6,
                             category: 'Manis',
@@ -1167,7 +1434,7 @@
                         {
                             id: 'p6',
                             name: 'kriuke rasa sapi panggang',
-                            subtitle: 'Kripik Pisang Rasa Sapi Panggang gurih...',
+                            subtitle: 'Gurihnya bumbu sapi panggang premium.',
                             price: 21000,
                             rating: 4.3,
                             category: 'Gurih',
@@ -1196,7 +1463,8 @@
                     isLoggedIn = true;
                     loginError.textContent = '';
                     loginForm.reset();
-                    renderAdminCategoryList(); // BARU
+                    renderAdminCategoryList();
+                    renderAdminPromoList(); 
                     renderAdminList();
                     navigate('page-admin');
                 } else {
@@ -1209,6 +1477,18 @@
                 isLoggedIn = false;
                 navigate('page-login');
             }
+            
+            // FUNGSI BARU: Mengatur visibilitas input Harga Normal
+            function toggleOriginalPriceInput(category) {
+                if (category === 'Promo Spesial') {
+                    originalPriceContainer.classList.remove('hidden');
+                    productOriginalPriceInput.setAttribute('required', 'required');
+                } else {
+                    originalPriceContainer.classList.add('hidden');
+                    productOriginalPriceInput.removeAttribute('required');
+                    productOriginalPriceInput.value = ''; // Clear value if not promo
+                }
+            }
 
             function showAddForm() {
                 formTitle.textContent = 'Tambah Produk Baru';
@@ -1216,7 +1496,11 @@
                 productIdInput.value = '';
                 productSubtitleInput.value = '';
                 productImagesInput.value = ''; 
-                renderCategoryOptions(''); // BARU
+                productOriginalPriceInput.value = ''; // Reset price
+                
+                const defaultCategory = categories.includes('Keripik Pisang') ? 'Keripik Pisang' : '';
+                renderCategoryOptions(defaultCategory); // Ini akan memanggil toggleOriginalPriceInput
+                
                 navigate('page-edit');
             }
 
@@ -1227,13 +1511,17 @@
                 formTitle.textContent = 'Edit Produk';
                 productIdInput.value = product.id;
                 productNameInput.value = product.name;
-                // productCategoryInput.value = product.category; // DIHAPUS
                 productSubtitleInput.value = product.subtitle || '';
                 productPriceInput.value = product.price;
                 productRatingInput.value = product.rating;
                 productImagesInput.value = product.images.join(', ');
                 productDescInput.value = product.description;
-                renderCategoryOptions(product.category); // BARU: Set kategori yang terpilih
+                
+                // Set Original Price Input (hanya jika ada)
+                productOriginalPriceInput.value = product.originalPrice || '';
+                
+                renderCategoryOptions(product.category); // Ini akan memanggil toggleOriginalPriceInput
+                
                 navigate('page-edit');
             }
 
@@ -1241,24 +1529,34 @@
                 e.preventDefault();
                 const id = productIdInput.value;
                 const newRating = parseFloat(productRatingInput.value);
-
+                const selectedCategory = productCategorySelect.value;
+                const price = parseInt(productPriceInput.value);
+                
+                let originalPrice = null;
+                if (selectedCategory === 'Promo Spesial' && originalPriceContainer.classList.contains('hidden') === false) {
+                    originalPrice = parseInt(productOriginalPriceInput.value);
+                    if (originalPrice <= price) {
+                        showToast('Harga Normal harus lebih tinggi dari Harga Jual untuk promo!');
+                        return;
+                    }
+                }
+                
                 if (isNaN(newRating) || newRating < 0 || newRating > 5) {
-                    showToast('Rating harus berupa angka antara 0 dan 5.');
+                    showToast('Rating harus berupa angka antara 0.0 dan 5.0.');
                     return;
                 }
 
-                // Ambil nilai dari SELECT (BARU)
-                const selectedCategory = productCategorySelect.value;
                 if (!selectedCategory) {
                     showToast('Pilih kategori produk.');
                     return;
                 }
 
                 const productData = {
-                    name: productNameInput.value,
-                    category: selectedCategory, // BARU
+                    name: productNameInput.value.toLowerCase(),
+                    category: selectedCategory,
                     subtitle: productSubtitleInput.value.trim() || '',
-                    price: parseInt(productPriceInput.value),
+                    price: price,
+                    originalPrice: originalPrice, // Simpan harga asli
                     rating: newRating,
                     images: productImagesInput.value.split(',').map(url => url.trim()).filter(url => url),
                     description: productDescInput.value
@@ -1275,7 +1573,7 @@
                     products[index] = { ...products[index], ...productData };
                 } else {
                     // Tambah produk baru
-                    productData.id = 'p' + (new Date().getTime()); // ID unik baru
+                    productData.id = 'p' + (new Date().getTime());
                     products.push(productData);
                 }
 
@@ -1283,6 +1581,7 @@
                 renderHomeProducts(activeCategory);
                 renderCategoryFilters();
                 renderAdminList();
+                showToast('Produk berhasil disimpan!');
                 navigate('page-admin');
             }
 
@@ -1293,13 +1592,15 @@
 
             function handleDelete() {
                 if (!productToDeleteId) return;
-                products = products.filter(p => p.id !== productToDeleteId);
+                const deletedProductId = productToDeleteId;
+
+                products = products.filter(p => p.id !== deletedProductId);
                 saveProducts();
                 
-                // Hapus dari keranjang dan liked list
-                cart = cart.filter(item => item.id !== productToDeleteId);
+                // Hapus dari keranjang dan favorit
+                cart = cart.filter(item => item.id !== deletedProductId);
                 saveCart();
-                likedProducts = likedProducts.filter(id => id !== productToDeleteId);
+                likedProducts = likedProducts.filter(id => id !== deletedProductId);
                 saveLikedProducts();
 
                 updateCartBadge();
@@ -1309,16 +1610,18 @@
                 renderAdminList();
                 deleteModal.classList.add('hidden');
                 productToDeleteId = null;
+                showToast('Produk berhasil dihapus.');
                 navigate('page-admin');
             }
             
             function renderAdminList() {
-                adminProductList.innerHTML = ''; // Kosongkan list
+                adminProductList.innerHTML = '';
                 if (products.length === 0) {
                     adminProductList.innerHTML = '<p class="text-gray-500 text-center">Belum ada produk.</p>';
                     return;
                 }
-                [...products].reverse().forEach(product => {
+                // Urutkan berdasarkan ID (terbaru di atas)
+                [...products].sort((a, b) => b.id.localeCompare(a.id)).forEach(product => {
                     const item = document.createElement('div');
                     item.className = 'flex items-center justify-between bg-white p-3 rounded-lg shadow-sm border';
                     item.innerHTML = `
@@ -1328,6 +1631,7 @@
                                 <h4 class="font-medium capitalize">${product.name}</h4>
                                 <div class="flex items-center gap-2 mt-1 flex-wrap">
                                     <p class="text-sm text-gray-600">Rp${formatRupiah(product.price)}</p>
+                                    ${product.originalPrice ? `<span class="text-xs text-red-500 bg-red-100 px-2 py-0.5 rounded-full">DISKON</span>` : ''}
                                     <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">${product.category}</span>
                                     <span class="flex items-center gap-1 text-xs text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full">
                                         <i class="fa-solid fa-star fa-xs"></i>
@@ -1337,10 +1641,10 @@
                             </div>
                         </div>
                         <div class="flex gap-2">
-                            <button class="edit-btn p-2 text-blue-500 hover:text-blue-700" data-id="${product.id}">
+                            <button class="edit-btn p-2 text-blue-500 hover:text-blue-700 transition-colors" data-id="${product.id}">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
-                            <button class="delete-btn p-2 text-red-500 hover:text-red-700" data-id="${product.id}">
+                            <button class="delete-btn p-2 text-red-500 hover:text-red-700 transition-colors" data-id="${product.id}">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -1362,8 +1666,198 @@
                     });
                 });
             }
+            
+            // === FUNGSI ADMIN PROMO CODE ===
 
-            // === FUNGSI KERANJANG ===
+            function loadPromoCodes() {
+                const storedPromoCodes = localStorage.getItem('kriuke_promo_codes');
+                if (storedPromoCodes) {
+                    promoCodes = JSON.parse(storedPromoCodes);
+                } else {
+                    // Data awal default
+                    promoCodes = {
+                        'KRIUKHEMAT': { type: 'percent', value: 10, description: 'Diskon 10% untuk total belanja' },
+                        'DISKON10K': { type: 'fixed', value: 10000, description: 'Potongan harga Rp 10.000' },
+                        'FREEONGKIR': { type: 'fixed', value: 5000, description: 'Potongan biaya kirim (simulasi)' }
+                    };
+                    savePromoCodes();
+                }
+            }
+
+            function savePromoCodes() {
+                localStorage.setItem('kriuke_promo_codes', JSON.stringify(promoCodes));
+            }
+
+            function updatePromoValueHint() {
+                const type = promoTypeSelect.value;
+                if (type === 'percent') {
+                    promoValueHint.textContent = 'Masukkan persentase (misal: 10 untuk 10%).';
+                } else {
+                    promoValueHint.textContent = 'Masukkan nominal Rupiah (misal: 10000 untuk Rp 10.000).';
+                }
+            }
+            
+            function showPromoForm(code = null) {
+                promoForm.reset();
+                promoOriginalCodeInput.value = '';
+                promoFormTitle.textContent = 'Tambah Kode Promo Baru';
+                promoFormError.textContent = '';
+                promoTypeSelect.addEventListener('change', updatePromoValueHint);
+                updatePromoValueHint(); // Set default hint
+
+                if (code) {
+                    const promo = promoCodes[code];
+                    if (!promo) return;
+                    
+                    promoFormTitle.textContent = `Edit Kode Promo: ${code}`;
+                    promoOriginalCodeInput.value = code;
+                    promoCodeInputEdit.value = code;
+                    promoTypeSelect.value = promo.type;
+                    promoValueInput.value = promo.value;
+                    promoDescriptionInput.value = promo.description;
+                    updatePromoValueHint();
+                }
+
+                navigate('page-promo-edit');
+            }
+
+            function handlePromoFormSubmit(e) {
+                e.preventDefault();
+                promoFormError.textContent = '';
+
+                const originalCode = promoOriginalCodeInput.value.toUpperCase();
+                const newCode = promoCodeInputEdit.value.trim().toUpperCase();
+                const newType = promoTypeSelect.value;
+                const newValue = parseInt(promoValueInput.value);
+                const newDescription = promoDescriptionInput.value.trim();
+
+                if (!newCode || !newType || isNaN(newValue) || newValue <= 0 || !newDescription) {
+                    promoFormError.textContent = 'Mohon lengkapi semua data dengan benar.';
+                    return;
+                }
+                
+                // Validasi duplikasi kode (kecuali jika sedang mengedit kodenya sendiri)
+                if (newCode !== originalCode && promoCodes.hasOwnProperty(newCode)) {
+                    promoFormError.textContent = `Kode promo "${newCode}" sudah ada!`;
+                    return;
+                }
+                
+                // Hapus kode lama jika kode diubah
+                if (originalCode && originalCode !== newCode) {
+                    delete promoCodes[originalCode];
+                    // Jika promo yang diubah sedang diterapkan di keranjang, hapus penerapannya
+                    if (appliedPromo === originalCode) {
+                        appliedPromo = null;
+                        promoCodeInput.value = '';
+                        promoStatusText.textContent = '';
+                    }
+                } else if (originalCode && newCode === originalCode) {
+                    // Edit tapi kode sama, lakukan update di tempat
+                } else if (!originalCode) {
+                    // Tambah baru
+                } else {
+                    return;
+                }
+                
+                // Simpan atau update kode baru
+                promoCodes[newCode] = {
+                    type: newType,
+                    value: newValue,
+                    description: newDescription
+                };
+
+                savePromoCodes();
+                showToast(`Kode promo "${newCode}" berhasil disimpan.`);
+                renderAdminPromoList();
+                // Jika sedang di halaman keranjang, panggil update total
+                if (document.getElementById('page-cart').classList.contains('active')) {
+                    updateCartTotalsUI();
+                }
+                navigate('page-admin');
+            }
+            
+            function renderAdminPromoList() {
+                promoListAdmin.innerHTML = '';
+                const codes = Object.keys(promoCodes);
+                
+                if (codes.length === 0) {
+                    promoListAdmin.innerHTML = '<p class="text-gray-600 text-sm">Belum ada kode promo. Tambahkan di atas.</p>';
+                    return;
+                }
+
+                codes.forEach(code => {
+                    const promo = promoCodes[code];
+                    const isDefault = ['KRIUKHEMAT', 'DISKON10K', 'FREEONGKIR'].includes(code);
+                    
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center justify-between bg-white p-3 rounded-lg shadow-sm border border-orange-200';
+                    item.innerHTML = `
+                        <div class="flex-grow">
+                            <h4 class="font-bold text-orange-600">${code}</h4>
+                            <p class="text-sm text-gray-700">${promo.description}</p>
+                            <span class="text-xs text-blue-500 font-medium">
+                                ${promo.type === 'percent' ? `${promo.value}%` : `Rp${formatRupiah(promo.value)}`}
+                                ${isDefault ? ' (Default)' : ''}
+                            </span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="edit-promo-btn p-2 text-blue-500 hover:text-blue-700 transition-colors" data-code="${code}" aria-label="Edit Promo">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="delete-promo-btn p-2 text-red-500 hover:text-red-700 transition-colors ${isDefault ? 'opacity-50 cursor-not-allowed' : ''}" data-code="${code}" ${isDefault ? 'disabled' : ''} aria-label="Hapus Promo">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    promoListAdmin.appendChild(item);
+                });
+                
+                // Add event listeners for edit and delete buttons
+                document.querySelectorAll('.edit-promo-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        showPromoForm(e.currentTarget.dataset.code);
+                    });
+                });
+
+                document.querySelectorAll('.delete-promo-btn:not([disabled])').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        showPromoDeleteConfirmation(e.currentTarget.dataset.code);
+                    });
+                });
+            }
+
+            function showPromoDeleteConfirmation(code) {
+                if (['KRIUKHEMAT', 'DISKON10K', 'FREEONGKIR'].includes(code)) {
+                    showToast(`Kode promo default "${code}" tidak dapat dihapus.`);
+                    return;
+                }
+                promoCodeToDelete = code;
+                promoToDeleteNameEl.textContent = code;
+                deletePromoModal.classList.remove('hidden');
+            }
+
+            function handleDeletePromo() {
+                if (!promoCodeToDelete) return;
+
+                if (appliedPromo === promoCodeToDelete) {
+                    appliedPromo = null; // Hapus promo yang sedang diterapkan jika dihapus
+                    promoCodeInput.value = '';
+                    promoStatusText.textContent = '';
+                    if (document.getElementById('page-cart').classList.contains('active')) {
+                        updateCartTotalsUI();
+                    }
+                }
+
+                delete promoCodes[promoCodeToDelete];
+                savePromoCodes();
+                
+                renderAdminPromoList();
+                deletePromoModal.classList.add('hidden');
+                showToast(`Kode promo "${promoCodeToDelete}" berhasil dihapus.`);
+                promoCodeToDelete = null;
+            }
+
+            // === FUNGSI KERANJANG & PROMO ===
 
             function loadCart() {
                 const storedCart = localStorage.getItem('kriuke_cart');
@@ -1388,22 +1882,82 @@
                 }
             }
             
-            // Tombol Add to Cart di card
-            function handleAddToCartFromCard(id) {
-                 handleCartAddition(id, 1);
+            // Menghitung subtotal, diskon, dan total
+            function calculateTotals() {
+                let subtotal = 0;
+                cart.forEach(item => {
+                    const product = products.find(p => p.id === item.id);
+                    if (product) {
+                        subtotal += product.price * item.quantity;
+                    }
+                });
+
+                let discount = 0;
+                let promoDetails = null;
+                // Menggunakan promoCodes state yang sudah diisi dari localStorage
+                if (appliedPromo && promoCodes[appliedPromo]) { 
+                    promoDetails = promoCodes[appliedPromo];
+                    if (promoDetails.type === 'percent') {
+                        discount = (subtotal * promoDetails.value) / 100;
+                    } else if (promoDetails.type === 'fixed') {
+                        discount = promoDetails.value;
+                    }
+                    // Batasi diskon maksimal sebesar subtotal
+                    if (discount > subtotal) {
+                        discount = subtotal;
+                    }
+                }
+
+                const total = subtotal - discount;
+                
+                return { subtotal, discount, total, promoDetails };
             }
 
-            // Tombol Add to Cart di Detail Footer (diubah)
-            function handleAddToCartFromDetail(e) {
-                const id = e.currentTarget.dataset.id;
-                handleCartAddition(id, 1);
-            }
+            // Memperbarui UI total di footer keranjang dan checkout
+            function updateCartTotalsUI() {
+                const { subtotal, discount, total } = calculateTotals();
 
+                // 1. Perbarui Halaman Keranjang
+                cartSubtotalEl.textContent = `Rp${formatRupiah(subtotal)}`;
+                cartTotalEl.textContent = `Rp${formatRupiah(total)}`;
+
+                if (discount > 0) {
+                    cartPromoDiscountEl.textContent = `-Rp${formatRupiah(discount)}`;
+                    promoDiscountRow.classList.remove('hidden');
+                } else {
+                    promoDiscountRow.classList.add('hidden');
+                }
+            }
+            
+            // Logika saat tombol "Pakai" promo diklik
+            function handleApplyPromo() {
+                const code = promoCodeInput.value.trim().toUpperCase();
+                
+                if (!code) {
+                    appliedPromo = null;
+                    promoStatusText.textContent = 'Kode promo dihapus.';
+                    promoStatusText.className = 'text-sm mt-1.5 text-red-500';
+                    updateCartTotalsUI();
+                    return;
+                }
+
+                if (promoCodes[code]) { // Cek dari state promoCodes yang baru
+                    appliedPromo = code;
+                    promoStatusText.textContent = `Kode "${code}" berhasil diterapkan! ${promoCodes[code].description}.`;
+                    promoStatusText.className = 'text-sm mt-1.5 text-green-600';
+                    promoCodeInput.value = code; // Tampilkan kode yang diterapkan
+                    updateCartTotalsUI();
+                } else {
+                    appliedPromo = null;
+                    promoStatusText.textContent = 'Kode promo tidak valid.';
+                    promoStatusText.className = 'text-sm mt-1.5 text-red-500';
+                    updateCartTotalsUI(); // Hitung ulang tanpa diskon
+                }
+            }
 
             function renderCartPage() {
                 cartItemsContainer.innerHTML = '';
-                let total = 0;
-
+                
                 if (cart.length === 0) {
                     cartItemsContainer.innerHTML = `
                         <div class="flex flex-col items-center justify-center text-center mt-10 p-4">
@@ -1415,23 +1969,29 @@
                             </button>
                         </div>
                     `;
+                    // Reset footer keranjang saat kosong
+                    cartSubtotalEl.textContent = 'Rp0';
                     cartTotalEl.textContent = 'Rp0';
+                    promoDiscountRow.classList.add('hidden');
+                    promoStatusText.textContent = '';
+                    promoCodeInput.value = '';
+                    appliedPromo = null;
+                    
                     checkoutWaBtn.disabled = true;
                     checkoutWaBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
-                    checkoutWaBtn.classList.remove('hover:bg-green-600');
+                    checkoutWaBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
                     return;
                 }
                 
                 checkoutWaBtn.disabled = false;
                 checkoutWaBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                checkoutWaBtn.classList.add('hover:bg-green-600');
+                    checkoutWaBtn.classList.add('bg-green-500', 'hover:bg-green-600');
 
                 cart.forEach(item => {
                     const product = products.find(p => p.id === item.id);
-                    if (!product) return; // Skip if product is deleted
+                    if (!product) return;
 
                     const itemTotal = product.price * item.quantity;
-                    total += itemTotal;
 
                     const itemEl = document.createElement('div');
                     itemEl.className = 'flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm border mb-3';
@@ -1439,14 +1999,14 @@
                         <img src="${product.images[0]}" alt="${product.name}" class="w-16 h-16 object-cover rounded" onerror="this.src='https://placehold.co/64x64/FFECB3/000000?text=Error'">
                         <div class="flex-grow">
                             <h4 class="font-medium capitalize">${product.name}</h4>
-                            <p class="text-sm text-gray-600">Rp${formatRupiah(product.price)}</p>
-                            <p class="text-sm font-semibold text-orange-600">Subtotal: Rp${formatRupiah(itemTotal)}</p>
+                            <p class="text-sm text-gray-600">Harga Satuan: Rp${formatRupiah(product.price)}</p>
+                            <p class="text-sm font-semibold text-orange-600">Subtotal Item: Rp${formatRupiah(itemTotal)}</p>
                         </div>
                         <div class="flex flex-col items-center gap-1">
                             <div class="flex items-center border rounded-lg">
-                                <button class="cart-quantity-btn px-2 py-1 bg-gray-100 hover:bg-gray-200" data-id="${product.id}" data-change="-1">-</button>
+                                <button class="cart-quantity-btn px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-l-lg" data-id="${product.id}" data-change="-1" aria-label="Kurangi kuantitas">-</button>
                                 <span class="px-2 text-sm">${item.quantity}</span>
-                                <button class="cart-quantity-btn px-2 py-1 bg-gray-100 hover:bg-gray-200" data-id="${product.id}" data-change="1">+</button>
+                                <button class="cart-quantity-btn px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-r-lg" data-id="${product.id}" data-change="1" aria-label="Tambah kuantitas">+</button>
                             </div>
                             <button class="cart-remove-btn text-xs font-medium text-red-500 hover:underline mt-1" data-id="${product.id}">Hapus</button>
                         </div>
@@ -1454,7 +2014,8 @@
                     cartItemsContainer.appendChild(itemEl);
                 });
 
-                cartTotalEl.textContent = `Rp${formatRupiah(total)}`;
+                // Panggil fungsi pembaruan total di akhir
+                updateCartTotalsUI();
 
                 // Add event listeners untuk tombol di keranjang
                 document.querySelectorAll('.cart-quantity-btn').forEach(btn => {
@@ -1478,11 +2039,11 @@
                 if (item) {
                     item.quantity += change;
                     if (item.quantity <= 0) {
-                        handleCartRemove(id);
+                        handleCartRemove(id); // Ini akan memanggil renderCartPage
                     } else {
                         saveCart();
                         updateCartBadge();
-                        renderCartPage();
+                        renderCartPage(); // Render ulang untuk item & total
                     }
                 }
             }
@@ -1491,7 +2052,7 @@
                 cart = cart.filter(item => item.id !== id);
                 saveCart();
                 updateCartBadge();
-                renderCartPage();
+                renderCartPage(); // Render ulang
             }
 
             // FUNGSI CHECKOUT
@@ -1500,17 +2061,24 @@
                     navigate('page-cart');
                     return;
                 }
-                let total = 0;
-                cart.forEach(item => {
-                    const product = products.find(p => p.id === item.id);
-                    if (product) {
-                        total += product.price * item.quantity;
-                    }
-                });
+                
+                const { subtotal, discount, total, promoDetails } = calculateTotals();
+                
+                // Perbarui UI footer checkout
+                checkoutPageSubtotalEl.textContent = `Rp${formatRupiah(subtotal)}`;
                 checkoutPageTotalEl.textContent = `Rp${formatRupiah(total)}`;
+
+                if (discount > 0) {
+                    checkoutPagePromoDiscountEl.textContent = `-Rp${formatRupiah(discount)}`;
+                    checkoutPromoDiscountRow.classList.remove('hidden');
+                } else {
+                    checkoutPromoDiscountRow.classList.add('hidden');
+                }
+                
                 checkoutError.textContent = '';
             }
 
+            // Pesan WA menyertakan info diskon
             function handleSendOrder(e) {
                 e.preventDefault();
                 checkoutError.textContent = '';
@@ -1530,29 +2098,37 @@
                     return;
                 }
 
-                let message = "Halo Kriuké Snack, saya mau pesan:\n\n";
-                message += "--- *Data Pengiriman* ---\n";
+                // Ambil total dari fungsi kalkulasi
+                const { subtotal, discount, total, promoDetails } = calculateTotals();
+
+                let message = `Halo Kriuké Snack, saya mau pesan:\n\n`;
+                message += `--- *Data Pengiriman* ---\n`;
                 message += `Nama: *${nama}*\n`;
                 message += `No. WhatsApp: *${wa}*\n`;
                 message += `Alamat: *${alamat}*\n`;
                 if (catatan) {
                     message += `Catatan: *${catatan}*\n`;
                 }
-                message += "\n--- *Detail Pesanan* ---\n";
+                message += `\n--- *Detail Pesanan* ---\n`;
                 
-                let total = 0;
-
                 cart.forEach(item => {
                     const product = products.find(p => p.id === item.id);
                     if (product) {
-                        message += `*${product.name}*\n`;
+                        message += `*${product.name.toUpperCase()}*\n`;
                         message += `Jumlah: ${item.quantity} pcs\n`;
-                        message += `Subtotal: Rp${formatRupiah(product.price * item.quantity)}\n\n`;
-                        total += product.price * item.quantity;
+                        message += `Subtotal Item: Rp${formatRupiah(product.price * item.quantity)}\n\n`;
                     }
                 });
 
+                // Tambahkan Ringkasan Total, Subtotal, dan Diskon
+                message += `*RINGKASAN HARGA*\n`;
+                message += `Subtotal: Rp${formatRupiah(subtotal)}\n`;
+                if (discount > 0 && appliedPromo && promoDetails) {
+                    let discountString = promoDetails.type === 'percent' ? ` (${promoDetails.value}%)` : '';
+                    message += `Diskon (${appliedPromo}${discountString}): -Rp${formatRupiah(discount)}\n`;
+                }
                 message += `*Total Pesanan: Rp${formatRupiah(total)}*\n\n`;
+                
                 message += "Mohon konfirmasi pesanan saya. Terima kasih!";
 
                 const encodedMessage = encodeURIComponent(message);
@@ -1560,13 +2136,40 @@
                 
                 window.open(waUrl, '_blank');
 
-                // Kosongkan keranjang & kembali ke home
+                // Kosongkan keranjang & promo setelah order dikirim
                 cart = [];
+                appliedPromo = null;
+                promoCodeInput.value = '';
+                promoStatusText.textContent = '';
                 saveCart();
                 updateCartBadge();
                 checkoutForm.reset();
+                
                 navigate('page-home');
                 showToast('Pesanan Anda sedang diproses!');
+            }
+
+
+            // === FUNGSI SLIDER PROMO (BARU) ===
+            function startPromoSlider() {
+                const sliderContainer = document.getElementById('promo-slider-container');
+                if (!sliderContainer) return; // Keluar jika slider tidak ada di halaman
+
+                const slides = sliderContainer.querySelectorAll('.promo-slide');
+                if (slides.length <= 1) return; // Tidak perlu slider jika hanya 1 gambar atau tidak ada
+
+                let currentSlideIndex = 0;
+
+                setInterval(() => {
+                    const nextSlideIndex = (currentSlideIndex + 1) % slides.length;
+
+                    // Fade out slide saat ini
+                    slides[currentSlideIndex].classList.replace('opacity-100', 'opacity-0');
+                    // Fade in slide berikutnya
+                    slides[nextSlideIndex].classList.replace('opacity-0', 'opacity-100');
+                    
+                    currentSlideIndex = nextSlideIndex;
+                }, 3000); // Ganti slide setiap 3 detik
             }
 
 
@@ -1577,54 +2180,50 @@
             menuCloseBtn.addEventListener('click', () => toggleMenu(false));
             menuOverlay.addEventListener('click', () => toggleMenu(false));
             
-            // Event listener untuk form tambah kategori (BARU)
+            // Event listener untuk form tambah kategori
             addCategoryForm.addEventListener('submit', handleAddCategory);
-            // Event listener untuk modal hapus kategori (BARU)
+            // Event listener untuk modal hapus kategori
             cancelCategoryDeleteBtn.addEventListener('click', () => deleteCategoryModal.classList.add('hidden'));
-            confirmCategoryDeleteBtn.addEventListener('click', handleDeleteCategory);
+            confirmCategoryDeleteBtn.addEventListener('click', handleDeleteCategory); 
+            
+            // Event listener untuk promo code
+            addPromoBtn.addEventListener('click', () => showPromoForm());
+            promoForm.addEventListener('submit', handlePromoFormSubmit);
+            cancelPromoDeleteBtn.addEventListener('click', () => deletePromoModal.classList.add('hidden'));
+            confirmPromoDeleteBtn.addEventListener('click', handleDeletePromo);
 
+            // Listener untuk mengubah visibilitas Harga Normal
+            productCategorySelect.addEventListener('change', (e) => {
+                toggleOriginalPriceInput(e.target.value);
+            });
+
+            // Search Input Listener
+            document.getElementById('search-input').addEventListener('input', () => {
+                renderHomeProducts(activeCategory);
+            });
 
             // Navigasi (Menggunakan Event Delegation)
             document.body.addEventListener('click', (e) => {
                 const button = e.target.closest('.navigate-btn');
                 if (button) {
                     const target = button.dataset.target;
-
-                    // Jika tombol yang diklik berada di dalam menu drawer, tutup menu terlebih dahulu
+                    
+                    // Handle menu close and navigation
                     if (offCanvasMenu.contains(button) && target) {
-                        // Tutup menu
                         toggleMenu(false);
-                        
-                        // Handle navigasi setelah penutupan
-                        // Menggunakan setTimeout pendek untuk memastikan transisi penutupan tidak terganggu
                         setTimeout(() => {
-                            if (target === 'page-admin' || target === 'page-edit' || target === 'page-login') {
-                                if (isLoggedIn) {
-                                    navigate('page-admin');
-                                } else {
-                                    navigate('page-login');
-                                }
+                            if (target === 'page-admin' || target === 'page-edit' || target === 'page-promo-edit' || target === 'page-login') {
+                                navigate(isLoggedIn ? 'page-admin' : 'page-login');
                             } else {
                                 navigate(target);
                             }
-                        }, 50); // Delay 50ms untuk transisi visual
-                        return; // Hentikan proses navigasi normal untuk tombol di menu
+                        }, 50);
+                        return;
                     }
 
-
-                    // Logika navigasi normal (untuk tombol di nav bawah, header, dll)
-                    if (target === 'page-admin' || target === 'page-edit') {
-                        if (isLoggedIn) {
-                            navigate('page-admin');
-                        } else {
-                            navigate('page-login');
-                        }
-                    } else if (target === 'page-login') {
-                        if (isLoggedIn) {
-                            navigate('page-admin');
-                        } else {
-                            navigate('page-login');
-                        }
+                    // Logika navigasi normal
+                    if (target === 'page-admin' || target === 'page-edit' || target === 'page-promo-edit' || target === 'page-login') {
+                        navigate(isLoggedIn ? 'page-admin' : 'page-login');
                     } else {
                         navigate(target);
                     }
@@ -1640,36 +2239,34 @@
                 btn.addEventListener('click', () => navigate('page-admin'));
             });
 
-            // Delete Modal
+            // Delete Modal Produk
             cancelDeleteBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
             confirmDeleteBtn.addEventListener('click', handleDelete);
             
-            // Tombol WA Detail
-            // Perlu event delegation karena tombol dibuat dinamis di showProductDetail
-            document.body.addEventListener('click', (e) => {
-                 if (e.target.closest('#detail-buy-wa-btn')) {
-                    handleBuyViaWa(e);
-                 } else if (e.target.closest('#detail-share-btn')) {
-                    const name = e.target.closest('#detail-share-btn').dataset.name;
-                    handleShare(name);
-                 } else if (e.target.closest('#detail-add-to-cart-btn')) {
-                    handleAddToCartFromDetail(e);
-                 }
-            });
-            
+            // Tombol "Lanjut ke Pengiriman"
             checkoutWaBtn.addEventListener('click', () => {
-                // Pergi ke halaman checkout
                 navigate('page-checkout');
             });
+            // Tombol "Kirim Pesanan" (Form Checkout)
             checkoutForm.addEventListener('submit', handleSendOrder);
+            
+            // --- Event Listener Tombol Promo ---
+            applyPromoBtn.addEventListener('click', handleApplyPromo);
+            promoCodeInput.addEventListener('focus', () => {
+                promoStatusText.textContent = ''; // Hapus status saat fokus
+                promoStatusText.classList.remove('text-red-500', 'text-green-600');
+            });
+            // ------------------------------------------
 
-            // Load data awal
-            loadCategories(); // BARU: Load kategori dulu
+            // Load data awal dan render UI
+            loadCategories();
+            loadPromoCodes(); 
             loadProducts();
             loadCart(); 
             renderCategoryFilters();
             renderHomeProducts();
-            navigate('page-home');
+            startPromoSlider(); // Panggil fungsi slider (BARU)
+            navigate('page-home'); // Pastikan halaman awal adalah home
         });
     </script>
 </body>
