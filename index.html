@@ -377,7 +377,7 @@
         <!-- ===== HALAMAN TAMBAH/EDIT PRODUK ===== -->
         <div id="page-edit" class="page">
             <header class="sticky top-0 z-50 bg-white shadow px-4 py-3 flex items-center">
-                <button class="cancel-edit-btn text-xl">
+                <button class="cancel-edit-btn text-xl" data-target="page-admin">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
                 <h2 id="form-title" class="text-lg font-semibold ml-4">Tambah Produk</h2>
@@ -709,6 +709,9 @@
             let promoCodeToDelete = null;
             // ---------------------------------
 
+            // VARIABEL UNTUK KONTROL SHARE (FIXED: Dideklarasikan di sini)
+            let isSharing = false; 
+            
             // === REFERENSI DOM ===
             const pages = document.querySelectorAll('.page');
             const navButtons = document.querySelectorAll('.nav-button-style');
@@ -1074,16 +1077,18 @@
                 } else {
                     const textToCopy = `${text} ${url}`;
                     try {
-                        await navigator.clipboard.writeText(textToCopy);
-                        showToast('Link berhasil disalin ke clipboard!');
-                    } catch (err) {
+                        // FIX: Menggunakan document.execCommand('copy') untuk kompatibilitas yang lebih luas.
                         const dummy = document.createElement('textarea');
                         document.body.appendChild(dummy);
                         dummy.value = textToCopy;
                         dummy.select();
                         document.execCommand('copy');
                         document.body.removeChild(dummy);
+
                         showToast('Link berhasil disalin ke clipboard!');
+                    } catch (err) {
+                        console.error('Could not copy text using execCommand: ', err);
+                        showToast('Gagal menyalin link ke clipboard.');
                     }
                 }
             }
