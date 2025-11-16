@@ -47,9 +47,34 @@
         }
         
         /* Mengatur padding bawah untuk halaman agar tidak tertutup nav bottom dan footer baru */
-        #page-home main, #page-detail main, #page-liked main, #page-admin main, #page-login main, #page-edit main, #page-promo-edit main {
+        #page-home main, #page-detail main, #page-liked main, #page-admin main, #page-login main, #page-edit main, #page-promo-edit main, #page-slide-edit main { /* #page-slide-edit BARU */
             /* Disesuaikan: 56px (nav bottom) + 144px (footer baru) = 200px */
             padding-bottom: 200px; 
+        }
+
+        /* Styling untuk Promo Slider BARU */
+        .promo-slide-item {
+            flex: 0 0 auto;
+            width: 85vw; /* Lebar 85% dari viewport width */
+            max-width: 320px; /* Batasi lebar maksimum */
+            height: 120px;
+        }
+        
+        /* Menyembunyikan scrollbar horizontal pada slider promo */
+        #promo-slider-container::-webkit-scrollbar {
+            display: none;
+        }
+        #promo-slider-container {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Tambahkan jarak horizontal yang baik antar slide */
+        #promo-slider-container > div {
+            padding-left: 1rem;
+        }
+        #promo-slider-container > div:last-child {
+            padding-right: 1rem;
         }
     </style>
 </head>
@@ -76,8 +101,8 @@
                     
                     <!-- Cart, TikTok Live & Menu Kanan -->
                     <div class="flex items-center gap-4">
-                        <!-- TikTok Live Button (BARU ICON) -->
-                        <a href="https://www.tiktok.com/@kriukesnack" target="_blank" class="text-2xl hover:opacity-80 transition-opacity" aria-label="Tonton TikTok Live">
+                        <!-- TikTok Live Button -->
+                        <a id="tiktok-live-link" href="#" target="_blank" class="text-2xl hover:opacity-80 transition-opacity" aria-label="Tonton TikTok Live">
                             <!-- Menggunakan GIF yang baru -->
                             <img src="https://i.ibb.co.com/DDBwMkYK/live-9601-256.gif" alt="TikTok Live" class="w-7 h-7 object-cover rounded-full shadow-md">
                         </a>
@@ -100,21 +125,13 @@
                 </div>
             </header>
 
-            <!-- ===== PROMO SLIDER (BARU) ===== -->
-            <div id="promo-slider-container" class="relative w-full h-48 overflow-hidden bg-gray-200">
-                <!-- Slide 1 -->
-                <div class="promo-slide absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-100">
-                    <img src="https://placehold.co/400x192/FF6B00/FFFFFF?text=Promo+Kriuk+Hemat" alt="Promo 1" class="w-full h-full object-cover">
-                </div>
-                <!-- Slide 2 -->
-                <div class="promo-slide absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0">
-                    <img src="https://placehold.co/400x192/4CAF50/FFFFFF?text=Gratis+Ongkir" alt="Promo 2" class="w-full h-full object-cover">
-                </div>
-                <!-- Slide 3 -->
-                <div class="promo-slide absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0">
-                    <img src="https://placehold.co/400x192/F44336/FFFFFF?text=Diskon+Akhir+Tahun" alt="Promo 3" class="w-full h-full object-cover">
+            <!-- ===== PROMO SLIDER SCROLLABLE (BARU) ===== -->
+            <div id="promo-slider-wrapper" class="py-3 px-0">
+                <div id="promo-slider-container" class="flex gap-3 overflow-x-scroll snap-x snap-mandatory">
+                    <!-- Slides akan di-render oleh JavaScript di sini -->
                 </div>
             </div>
+
 
             <!-- Kategori Filter -->
             <div class="px-4 py-3 border-b border-gray-200">
@@ -302,6 +319,31 @@
                     <i class="fa-solid fa-plus mr-2"></i> Tambah Produk Baru
                 </button>
                 
+                <!-- KELOLA TIKTOK LIVE URL -->
+                <h3 class="font-semibold text-gray-800 mb-3 border-t pt-4 mt-6">Kelola Tautan TikTok Live</h3>
+                <div class="bg-gray-50 p-3 rounded-lg mb-6 border border-gray-200">
+                    <form id="tiktok-live-form">
+                        <div class="mb-4">
+                            <label for="tiktok-live-input" class="block text-sm font-medium text-gray-700 mb-1">URL TikTok Live/Profil</label>
+                            <input type="url" id="tiktok-live-input" placeholder="https://www.tiktok.com/@user" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors">
+                            <p class="text-xs text-gray-500 mt-1">Ini akan digunakan untuk tombol TikTok Live di header.</p>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 transition-colors">Simpan Tautan Live</button>
+                    </form>
+                </div>
+
+                <!-- KELOLA SLIDER PROMO (BARU) -->
+                <h3 class="font-semibold text-gray-800 mb-3 border-t pt-4 mt-6">Kelola Promo Slider</h3>
+                <div class="bg-gray-50 p-3 rounded-lg mb-6 border border-gray-200">
+                    <div id="promo-slide-list-admin" class="space-y-2 mb-3">
+                        <!-- List slide akan di-render di sini -->
+                    </div>
+                    <button id="add-slide-btn" class="w-full bg-red-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-red-600 transition-colors">
+                        <i class="fa-solid fa-plus mr-2"></i> Tambah Slide Promo
+                    </button>
+                </div>
+
+
                 <!-- KELOLA KATEGORI -->
                 <h3 class="font-semibold text-gray-800 mb-3 border-t pt-4 mt-6">Kelola Kategori Produk</h3>
                 <div class="bg-gray-50 p-3 rounded-lg mb-6 border border-gray-200">
@@ -314,7 +356,7 @@
                     </form>
                 </div>
                 
-                <!-- KELOLA PROMO CODE (BARU) -->
+                <!-- KELOLA PROMO CODE -->
                 <h3 class="font-semibold text-gray-800 mb-3 border-t pt-4 mt-6">Kelola Kode Promo</h3>
                 <div class="bg-gray-50 p-3 rounded-lg mb-6 border border-gray-200">
                     <div id="promo-list-admin" class="space-y-2 mb-3">
@@ -395,7 +437,7 @@
             </main>
         </div>
         
-        <!-- ===== HALAMAN TAMBAH/EDIT PROMO CODE (BARU) ===== -->
+        <!-- ===== HALAMAN TAMBAH/EDIT PROMO CODE ===== -->
         <div id="page-promo-edit" class="page">
             <header class="sticky top-0 z-50 bg-white shadow px-4 py-3 flex items-center">
                 <button class="navigate-btn text-xl" data-target="page-admin">
@@ -437,6 +479,41 @@
                 <p id="promo-form-error" class="text-red-500 text-sm text-center mt-4"></p>
             </main>
         </div>
+
+        <!-- ===== HALAMAN TAMBAH/EDIT SLIDE PROMO (BARU) ===== -->
+        <div id="page-slide-edit" class="page">
+            <header class="sticky top-0 z-50 bg-white shadow px-4 py-3 flex items-center">
+                <button class="navigate-btn text-xl" data-target="page-admin">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 id="slide-form-title" class="text-lg font-semibold ml-4">Tambah Slide Promo</h2>
+            </header>
+            <main class="p-4 pb-20">
+                <form id="slide-form">
+                    <input type="hidden" id="slide-id">
+                    
+                    <div class="mb-4">
+                        <label for="slide-title" class="block text-sm font-medium text-gray-700 mb-1">Judul/Teks Utama</label>
+                        <input type="text" id="slide-title" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors" placeholder="Diskon 50% Semua Rasa" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="slide-image-url" class="block text-sm font-medium text-gray-700 mb-1">URL Gambar Slide</label>
+                        <input type="url" id="slide-image-url" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors" placeholder="https://..." required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="slide-link-url" class="block text-sm font-medium text-gray-700 mb-1">Tautan Klik (Link URL)</label>
+                        <input type="url" id="slide-link-url" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors" placeholder="https://kriuke-snack.id/promo-spesial">
+                        <p class="text-xs text-gray-500 mt-1">Kosongkan jika tidak ada tautan.</p>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">Simpan Slide</button>
+                </form>
+                <p id="slide-form-error" class="text-red-500 text-sm text-center mt-4"></p>
+            </main>
+        </div>
+
 
         <!-- Bottom Navigation Bar -->
         <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 max-w-md w-full bg-white shadow-[0_-2px_6px_rgba(0,0,0,0.06)] border-t border-gray-200 grid grid-cols-4 z-50">
@@ -546,6 +623,20 @@
         </div>
     </div>
     
+    <!-- Custom Modal for Delete Slide Confirmation (BARU) -->
+    <div id="delete-slide-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full">
+            <h3 class="text-lg font-semibold mb-4">Konfirmasi Hapus Slide</h3>
+            <p class="text-gray-600 mb-6">Apakah Anda yakin ingin menghapus slide promo: <span id="slide-to-delete-name" class="font-bold text-orange-600"></span>?</p>
+            <div class="flex justify-end gap-3">
+                <button id="cancel-slide-delete" class="px-4 py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300 transition-colors">Batal</button>
+                <button id="confirm-slide-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+
+    
     <!-- Off-Canvas Menu -->
     <div id="off-canvas-menu" class="fixed inset-0 z-[100] hidden">
         <!-- Overlay -->
@@ -609,9 +700,12 @@
             let productToDeleteId = null;
             let categoryToDelete = null;
             
+            let settings = {}; 
+            let promoSlides = []; // BARU: Data Slide Promo
+            
             // --- Logika Kode Promo ---
-            let appliedPromo = null; // Menyimpan *kunci* promo yang diterapkan
-            let promoCodes = {}; // Akan diinisialisasi dari localStorage
+            let appliedPromo = null; 
+            let promoCodes = {}; 
             let promoCodeToDelete = null;
             // ---------------------------------
 
@@ -632,10 +726,11 @@
             const productNameInput = document.getElementById('product-name');
             const productCategorySelect = document.getElementById('product-category-select'); 
             const productSubtitleInput = document.getElementById('product-subtitle');
-            
+            const tiktokLiveLinkEl = document.getElementById('tiktok-live-link'); 
+
             // Referensi HARGA
-            const originalPriceContainer = document.getElementById('original-price-container'); // BARU
-            const productOriginalPriceInput = document.getElementById('product-original-price'); // BARU
+            const originalPriceContainer = document.getElementById('original-price-container'); 
+            const productOriginalPriceInput = document.getElementById('product-original-price'); 
             const productPriceInput = document.getElementById('product-price');
             
             const productRatingInput = document.getElementById('product-rating');
@@ -662,12 +757,10 @@
 
             // Referensi Halaman Checkout
             const checkoutForm = document.getElementById('checkout-form');
-            // --- Referensi Total Checkout ---
             const checkoutPageSubtotalEl = document.getElementById('checkout-page-subtotal');
             const checkoutPromoDiscountRow = document.getElementById('checkout-promo-discount-row');
             const checkoutPagePromoDiscountEl = document.getElementById('checkout-page-promo-discount');
             const checkoutPageTotalEl = document.getElementById('checkout-page-total');
-            // ------------------------------------------
             const checkoutError = document.getElementById('checkout-error');
 
             // Referensi Halaman Liked
@@ -706,13 +799,31 @@
             const promoFormError = document.getElementById('promo-form-error');
             const promoListAdmin = document.getElementById('promo-list-admin');
             const promoValueHint = document.getElementById('promo-value-hint');
-            
-            // Referensi Modal Hapus Promo
             const deletePromoModal = document.getElementById('delete-promo-modal');
             const promoToDeleteNameEl = document.getElementById('promo-to-delete-name');
             const cancelPromoDeleteBtn = document.getElementById('cancel-promo-delete');
             const confirmPromoDeleteBtn = document.getElementById('confirm-promo-delete');
 
+            // Referensi Admin TikTok Live
+            const tiktokLiveForm = document.getElementById('tiktok-live-form'); 
+            const tiktokLiveInput = document.getElementById('tiktok-live-input'); 
+
+            // --- Referensi Promo Slide (BARU) ---
+            const promoSlideListAdmin = document.getElementById('promo-slide-list-admin');
+            const addSlideBtn = document.getElementById('add-slide-btn');
+            const promoSliderContainer = document.getElementById('promo-slider-container');
+            
+            const slideForm = document.getElementById('slide-form');
+            const slideFormTitle = document.getElementById('slide-form-title');
+            const slideIdInput = document.getElementById('slide-id');
+            const slideTitleInput = document.getElementById('slide-title');
+            const slideImageUrlInput = document.getElementById('slide-image-url');
+            const slideLinkUrlInput = document.getElementById('slide-link-url');
+            const deleteSlideModal = document.getElementById('delete-slide-modal');
+            const slideToDeleteNameEl = document.getElementById('slide-to-delete-name');
+            const cancelSlideDeleteBtn = document.getElementById('cancel-slide-delete');
+            const confirmSlideDeleteBtn = document.getElementById('confirm-slide-delete');
+            let slideToDeleteId = null;
 
             // === FUNGSI UTILITAS ===
 
@@ -727,10 +838,220 @@
                     toastNotification.classList.add('opacity-0');
                 }, 2000);
             }
+            
+            // --- FUNGSI PENGATURAN GLOBAL ---
+            function loadSettings() {
+                const storedSettings = localStorage.getItem('kriuke_settings');
+                if (storedSettings) {
+                    settings = JSON.parse(storedSettings);
+                } else {
+                    settings = {
+                        tiktokLiveUrl: 'https://www.tiktok.com/@kriukesnack' 
+                    };
+                    saveSettings();
+                }
+                updateTikTokLiveLink();
+            }
 
-            // Fungsi Share utama
-            let isSharing = false; 
+            function saveSettings() {
+                localStorage.setItem('kriuke_settings', JSON.stringify(settings));
+            }
+            
+            function updateTikTokLiveLink() {
+                if (tiktokLiveLinkEl) {
+                    tiktokLiveLinkEl.href = settings.tiktokLiveUrl || '#';
+                }
+            }
+            
+            function renderAdminSettings() {
+                if (tiktokLiveInput) {
+                    tiktokLiveInput.value = settings.tiktokLiveUrl || '';
+                }
+            }
 
+            function handleTikTokLiveForm(e) {
+                e.preventDefault();
+                const newUrl = tiktokLiveInput.value.trim();
+                
+                settings.tiktokLiveUrl = newUrl;
+                saveSettings();
+                updateTikTokLiveLink();
+                showToast('Tautan TikTok Live berhasil diperbarui!');
+            }
+            // --- AKHIR FUNGSI PENGATURAN GLOBAL ---
+
+            // --- FUNGSI PROMO SLIDE (BARU) ---
+
+            function loadPromoSlides() {
+                const storedSlides = localStorage.getItem('kriuke_promo_slides');
+                if (storedSlides) {
+                    promoSlides = JSON.parse(storedSlides);
+                } else {
+                    // Data default
+                    promoSlides = [
+                        { id: 's1', title: 'DISKON TERBATAS 20%', imageUrl: 'https://placehold.co/400x120/FF6B00/FFFFFF?text=Diskon+20%25', linkUrl: '#', isDefault: true },
+                        { id: 's2', title: 'PROMO GRATIS ONGKIR', imageUrl: 'https://placehold.co/400x120/4CAF50/FFFFFF?text=Gratis+Ongkir', linkUrl: '#', isDefault: true },
+                        { id: 's3', title: 'BELI 3 GRATIS 1!', imageUrl: 'https://placehold.co/400x120/F44336/FFFFFF?text=Beli+3+Gratis+1', linkUrl: '#', isDefault: true },
+                    ];
+                    savePromoSlides();
+                }
+            }
+
+            function savePromoSlides() {
+                localStorage.setItem('kriuke_promo_slides', JSON.stringify(promoSlides));
+            }
+
+            function renderHomePromoSlider() {
+                promoSliderContainer.innerHTML = '';
+
+                if (promoSlides.length === 0) {
+                    promoSliderContainer.innerHTML = '<p class="text-gray-500 text-center w-full">Tidak ada promo aktif.</p>';
+                    return;
+                }
+
+                // Urutkan terbaru di depan
+                [...promoSlides].reverse().forEach(slide => {
+                    const link = slide.linkUrl || '#';
+                    const slideItem = document.createElement('a');
+                    slideItem.href = link;
+                    slideItem.target = "_blank";
+                    slideItem.className = 'promo-slide-item flex-shrink-0 relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow snap-center';
+                    
+                    slideItem.innerHTML = `
+                        <img src="${slide.imageUrl}" alt="${slide.title}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x120/FF6B00/FFFFFF?text=Error'">
+                        <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center p-3">
+                            <h4 class="text-white text-md font-bold text-center">${slide.title}</h4>
+                        </div>
+                    `;
+
+                    promoSliderContainer.appendChild(slideItem);
+                });
+            }
+
+            function renderAdminPromoSlideList() {
+                promoSlideListAdmin.innerHTML = '';
+                
+                if (promoSlides.length === 0) {
+                    promoSlideListAdmin.innerHTML = '<p class="text-gray-600 text-sm">Belum ada slide promo. Tambahkan di bawah.</p>';
+                    return;
+                }
+                
+                [...promoSlides].reverse().forEach(slide => {
+                    const isDefault = slide.isDefault;
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center justify-between bg-white p-3 rounded-lg shadow-sm border border-red-200';
+                    item.innerHTML = `
+                        <div class="flex items-center gap-3 flex-grow min-w-0">
+                            <img src="${slide.imageUrl}" alt="${slide.title}" class="w-12 h-12 object-cover rounded" onerror="this.src='https://placehold.co/48x48/F44336/FFFFFF?text=S'">
+                            <div class="flex-grow min-w-0">
+                                <h4 class="font-medium text-red-600 truncate">${slide.title}</h4>
+                                <p class="text-xs text-gray-500 truncate">${slide.linkUrl || 'Tidak ada tautan'}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 flex-shrink-0">
+                            <button class="edit-slide-btn p-2 text-blue-500 hover:text-blue-700 transition-colors" data-id="${slide.id}" aria-label="Edit Slide">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="delete-slide-btn p-2 text-red-500 hover:text-red-700 transition-colors ${isDefault ? 'opacity-50 cursor-not-allowed' : ''}" data-id="${slide.id}" ${isDefault ? 'disabled' : ''} aria-label="Hapus Slide">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    promoSlideListAdmin.appendChild(item);
+                });
+
+                document.querySelectorAll('.edit-slide-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        showSlideForm(e.currentTarget.dataset.id);
+                    });
+                });
+
+                document.querySelectorAll('.delete-slide-btn:not([disabled])').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        showSlideDeleteConfirmation(e.currentTarget.dataset.id);
+                    });
+                });
+            }
+
+            function showSlideForm(id = null) {
+                slideForm.reset();
+                slideIdInput.value = '';
+                slideFormTitle.textContent = 'Tambah Slide Promo Baru';
+                
+                if (id) {
+                    const slide = promoSlides.find(s => s.id === id);
+                    if (!slide) return;
+                    
+                    slideFormTitle.textContent = `Edit Slide: ${slide.title}`;
+                    slideIdInput.value = slide.id;
+                    slideTitleInput.value = slide.title;
+                    slideImageUrlInput.value = slide.imageUrl;
+                    slideLinkUrlInput.value = slide.linkUrl || '';
+                }
+
+                navigate('page-slide-edit');
+            }
+
+            function handleSlideFormSubmit(e) {
+                e.preventDefault();
+                const id = slideIdInput.value;
+                const title = slideTitleInput.value.trim();
+                const imageUrl = slideImageUrlInput.value.trim();
+                const linkUrl = slideLinkUrlInput.value.trim();
+
+                const slideData = {
+                    title: title,
+                    imageUrl: imageUrl,
+                    linkUrl: linkUrl || null,
+                    isDefault: false
+                };
+
+                if (id) {
+                    // Edit
+                    const index = promoSlides.findIndex(s => s.id === id);
+                    if (index !== -1) {
+                        promoSlides[index] = { ...promoSlides[index], ...slideData };
+                    }
+                } else {
+                    // Tambah baru
+                    slideData.id = 's' + (new Date().getTime());
+                    promoSlides.push(slideData);
+                }
+
+                savePromoSlides();
+                renderHomePromoSlider();
+                renderAdminPromoSlideList();
+                showToast('Slide Promo berhasil disimpan!');
+                navigate('page-admin');
+            }
+            
+            function showSlideDeleteConfirmation(id) {
+                const slide = promoSlides.find(s => s.id === id);
+                if (!slide || slide.isDefault) {
+                     showToast("Slide default tidak dapat dihapus.");
+                     return;
+                }
+                slideToDeleteId = id;
+                slideToDeleteNameEl.textContent = slide.title;
+                deleteSlideModal.classList.remove('hidden');
+            }
+
+            function handleDeleteSlide() {
+                if (!slideToDeleteId) return;
+
+                promoSlides = promoSlides.filter(s => s.id !== slideToDeleteId);
+                savePromoSlides();
+                
+                renderHomePromoSlider();
+                renderAdminPromoSlideList();
+                deleteSlideModal.classList.add('hidden');
+                showToast('Slide Promo berhasil dihapus.');
+                slideToDeleteId = null;
+            }
+
+            // --- AKHIR FUNGSI PROMO SLIDE ---
+
+            // FUNGSI SHARE UTAMA (Dipertahankan)
             async function handleShare(productName) {
                 if (isSharing) return;
 
@@ -751,13 +1072,11 @@
                         isSharing = false;
                     }
                 } else {
-                    // Fallback for copying to clipboard
                     const textToCopy = `${text} ${url}`;
                     try {
                         await navigator.clipboard.writeText(textToCopy);
                         showToast('Link berhasil disalin ke clipboard!');
                     } catch (err) {
-                         // Older execCommand fallback
                         const dummy = document.createElement('textarea');
                         document.body.appendChild(dummy);
                         dummy.value = textToCopy;
@@ -773,7 +1092,6 @@
                 handleShare(name);
             }
             
-            // FUNGSI BARU: Langsung buat pesan WA untuk produk tunggal di kartu
             function handleBuySingleWa(id) {
                 const product = products.find(p => p.id === id);
                 if (!product) return;
@@ -801,7 +1119,6 @@
 
                 saveCart();
                 updateCartBadge();
-                // Perbarui total jika sedang di halaman keranjang/checkout
                 const activePageId = document.querySelector('.page.active').id;
                 if (activePageId === 'page-cart') {
                     renderCartPage();
@@ -811,7 +1128,7 @@
                 showToast(`${product.name.toUpperCase()} ditambahkan ke keranjang!`);
             }
             
-            // FUNGSI MENU TOGGLE
+            // FUNGSI MENU TOGGLE (Dipertahankan)
             function toggleMenu(show) {
                 if (show) {
                     offCanvasMenu.classList.remove('hidden');
@@ -829,7 +1146,7 @@
             }
 
 
-            // FUNGSI NAVIGASI
+            // FUNGSI NAVIGASI (Dipertahankan)
             function navigate(pageId) {
                 pages.forEach(page => page.classList.remove('active'));
                 
@@ -846,32 +1163,29 @@
                 } else if (pageId === 'page-liked') {
                     renderLikedPage();
                 } else if (pageId === 'page-admin') {
+                    renderAdminSettings(); 
                     renderAdminCategoryList();
                     renderAdminPromoList(); 
+                    renderAdminPromoSlideList(); // BARU
                     renderAdminList();
                 }
 
-                // Update status tombol navigasi bawah
                 navButtons.forEach(btn => {
                     const target = btn.dataset.target;
                     const isActivePage = (target === pageId) || 
-                                         (target === 'page-login' && (pageId === 'page-admin' || pageId === 'page-edit' || pageId === 'page-promo-edit')) ||
+                                         (target === 'page-login' && (pageId === 'page-admin' || pageId === 'page-edit' || pageId === 'page-promo-edit' || pageId === 'page-slide-edit')) || // Tambah page-slide-edit
                                          (target === 'page-cart' && pageId === 'page-checkout'); 
 
-                    // Hapus semua warna aktif
                     btn.classList.remove('text-orange-600', 'text-gray-600', 'text-red-500');
                     if (isActivePage) {
-                        // Terapkan warna aktif spesifik
                         const activeColor = btn.dataset.activeColor || 'text-orange-600';
                         btn.classList.add(activeColor);
                     } else {
-                        // Terapkan warna default
                         const defaultColor = btn.dataset.defaultColor || 'text-gray-600';
                         btn.classList.add(defaultColor);
                     }
                 });
 
-                // Update status ikon keranjang di header
                 if (pageId === 'page-cart' || pageId === 'page-checkout') {
                     cartIconBtn.classList.add('text-orange-600');
                     cartIconBtn.classList.remove('text-gray-700');
@@ -881,7 +1195,7 @@
                 }
             }
             
-            // FUNGSI UNTUK MERENDER BINTANG RATING
+            // FUNGSI UNTUK MERENDER BINTANG RATING (Dipertahankan)
             function renderStars(rating) {
                 const fullStars = Math.floor(rating);
                 const hasHalfStar = rating % 1 !== 0;
@@ -899,25 +1213,22 @@
                 return starsHtml;
             }
 
-            // FUNGSI DETAIL PRODUK
+            // FUNGSI DETAIL PRODUK (Dipertahankan)
             function showProductDetail(id) {
                 const product = products.find(p => p.id === id);
                 if (!product) return;
                 
-                // Ambil rata-rata rating (jika ada ulasan)
                 const totalReviews = product.reviews ? product.reviews.length : 0;
                 const averageRating = product.reviews 
                     ? (product.reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1)
-                    : product.rating; // Gunakan rating default jika tidak ada ulasan
+                    : product.rating;
 
-                // --- GENERATE ULASAN ---
                 let reviewSummaryHtml = '';
                 let reviewsListHtml = '';
                 
                 if (totalReviews > 0) {
-                    const ratingCounts = [0, 0, 0, 0, 0]; // Index 0=1 bintang, 4=5 bintang
+                    const ratingCounts = [0, 0, 0, 0, 0]; 
                     product.reviews.forEach(r => {
-                        // Kumpulkan hanya rating 4 dan 5 untuk ringkasan visual
                         if (r.rating >= 4) {
                             ratingCounts[r.rating - 1]++;
                         }
@@ -930,7 +1241,6 @@
                         <div class="mt-6 border p-4 bg-gray-50 rounded-lg">
                             <h4 class="font-bold text-gray-800 mb-3">Ringkasan Rating (${totalReviews} Ulasan)</h4>
                             <div class="space-y-1 text-sm">
-                                <!-- Bar Rating 5 Bintang -->
                                 <div class="flex items-center gap-2">
                                     <span class="font-medium w-4">5</span>
                                     ${renderStars(5)}
@@ -939,7 +1249,6 @@
                                     </div>
                                     <span class="w-10 text-right text-gray-600">${percent5}%</span>
                                 </div>
-                                <!-- Bar Rating 4 Bintang -->
                                 <div class="flex items-center gap-2">
                                     <span class="font-medium w-4">4</span>
                                     ${renderStars(4)}
@@ -952,7 +1261,6 @@
                         </div>
                     `;
 
-                    // Generate list ulasan
                     reviewsListHtml = `
                         <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-4 border-t pt-4">Semua Ulasan Pelanggan</h3>
                         <div class="space-y-6">
@@ -980,9 +1288,6 @@
                         </div>
                     `;
                 }
-
-                // --- AKHIR GENERATE ULASAN ---
-
 
                 let thumbnailHTML = '';
                 product.images.forEach((img, index) => {
@@ -1095,7 +1400,7 @@
                 window.open(waUrl, '_blank');
             }
             
-            // === FUNGSI LIKE/DISLIKE ===
+            // === FUNGSI LIKE/DISLIKE (Dipertahankan) ===
             function saveLikedProducts() {
                 localStorage.setItem('kriuke_liked', JSON.stringify(likedProducts));
             }
@@ -1128,7 +1433,6 @@
             
             function renderLikedPage() {
                 likedItemsContainer.innerHTML = '';
-                // Filter produk yang datanya masih ada
                 const likedProductsData = products.filter(p => likedProducts.includes(p.id));
 
                 if (likedProductsData.length === 0) {
@@ -1187,7 +1491,7 @@
                 });
             }
 
-            // === FUNGSI RENDER HOME ===
+            // === FUNGSI RENDER HOME (Diperbarui untuk Harga Baru) ===
             function renderHomeProducts(filterCategory = 'Semua') {
                 productGrid.innerHTML = '';
 
@@ -1213,7 +1517,7 @@
                 filteredProducts.forEach(product => {
                     const isLiked = likedProducts.includes(product.id);
                     const likeIconClass = isLiked ? 'fa-solid text-red-500' : 'fa-regular text-gray-300';
-                    const totalSold = Math.floor(Math.random() * 500) + 100; // Contoh data acak
+                    const totalSold = Math.floor(Math.random() * 500) + 100; 
                     
                     // Logic untuk menampilkan harga dicoret
                     const showOriginalPrice = product.originalPrice && product.originalPrice > product.price;
@@ -1255,7 +1559,7 @@
                                 <p class="text-xl font-bold text-red-600">Rp${formatRupiah(product.price)}</p>
                             </div>
 
-                            <!-- BARIS TOMBOL AKSI: DIRAPIKAN MENJADI 3 BAGIAN SAMA BESAR -->
+                            <!-- BARIS TOMBOL AKSI -->
                             <div class="flex gap-2">
                                 <button data-id="${product.id}" data-name="${product.name}" class="share-card-btn w-1/3 p-2 bg-white border border-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-100 transition-colors flex items-center justify-center text-xl">
                                     <i class="fa-solid fa-share-alt"></i>
@@ -1287,7 +1591,6 @@
                         handleCartAddition(product.id, 1);
                     });
                     
-                    // Event listener untuk tombol WhatsApp baru
                     productCard.querySelector('.buy-single-wa-btn').addEventListener('click', (e) => {
                         e.stopPropagation();
                         handleBuySingleWa(product.id);
@@ -1297,10 +1600,11 @@
                 });
             }
 
+            // FUNGSI KATEGORI (Dipertahankan)
             function renderCategoryFilters() {
-                const productCategories = products.map(p => p.category).filter(c => c); // Ambil semua kategori dari produk
-                const allCategories = ['Semua', ...categories]; // Gunakan state categories + 'Semua'
-                const uniqueCategories = [...new Set(allCategories)]; // Pastikan unik
+                const productCategories = products.map(p => p.category).filter(c => c); 
+                const allCategories = ['Semua', ...categories]; 
+                const uniqueCategories = [...new Set(allCategories)]; 
                 
                 categoryFilterContainer.innerHTML = ''; 
 
@@ -1329,8 +1633,7 @@
             }
 
 
-            // === FUNGSI KATEGORI ADMIN ===
-
+            // === FUNGSI KATEGORI ADMIN (Dipertahankan) ===
             function loadCategories() {
                 const storedCategories = localStorage.getItem('kriuke_categories');
                 if (storedCategories) {
@@ -1361,9 +1664,7 @@
                 }
             }
             
-            // FUNGSI UNTUK MENAMPILKAN MODAL HAPUS KATEGORI
             function showCategoryDeleteConfirmation(category) {
-                // Kategori default yang dilindungi
                 const defaultCategories = ['Semua', 'Keripik Pisang', 'Promo Spesial', 'Manis', 'Gurih', 'Pedas', 'Lainnya'];
                 if (defaultCategories.includes(category)) {
                      showToast(`Kategori default "${category}" tidak dapat dihapus.`);
@@ -1374,7 +1675,6 @@
                 deleteCategoryModal.classList.remove('hidden');
             }
 
-            // FUNGSI UNTUK MELAKUKAN HAPUS KATEGORI
             function handleDeleteCategory() {
                 if (!categoryToDelete) return;
                 
@@ -1382,7 +1682,6 @@
                 categories = categories.filter(c => c !== deletedCategory);
                 saveCategories();
 
-                // Pindahkan produk yang kehilangan kategori ke kategori 'Lainnya'
                 products.forEach(p => {
                     if (p.category === deletedCategory) {
                         p.category = 'Lainnya';
@@ -1390,7 +1689,6 @@
                 });
                 saveProducts();
                 
-                // Render ulang semua yang terkait
                 renderAdminCategoryList();
                 renderCategoryFilters();
                 renderAdminList();
@@ -1442,121 +1740,23 @@
                     productCategorySelect.appendChild(option);
                 });
                 
-                // Panggil toggle visibility setelah options di-render
                 toggleOriginalPriceInput(selectedCategory);
             }
 
 
-            // === FUNGSI DATA & ADMIN PRODUK ===
+            // === FUNGSI DATA & ADMIN PRODUK (Dipertahankan) ===
             function loadProducts() {
                 const storedProducts = localStorage.getItem('kriuke_products');
                 if (storedProducts) {
                     products = JSON.parse(storedProducts);
                 } else {
-                    // Data awal (p2 ditambahkan originalPrice)
                     products = [
-                        {
-                            id: 'p1',
-                            name: 'kripik pisang rasa original',
-                            subtitle: 'Gurih alami, kriuknya beda.',
-                            price: 25000,
-                            rating: 4.8,
-                            category: 'Keripik Pisang',
-                            images: [
-                                'https://placehold.co/300x300/FEE300/000000?text=Original+Pack',
-                                'https://placehold.co/300x300/8D6E63/FFFFFF?text=Original+Detail'
-                            ],
-                            description: 'Kripik pisang renyah dengan rasa asli pisang yang gurih alami. Cocok untuk semua kalangan dan camilan harian Anda. Kriuknya beda, rasanya istimewa!',
-                            isLiked: false,
-                            reviews: [
-                                { user: 'Ani', rating: 5, date: '10/05/2025', comment: 'Rasa original yang selalu bikin kangen! Kriuknya pas, tidak terlalu manis.' },
-                                { user: 'Budi', rating: 4, date: '12/05/2025', comment: 'Kualitas oke, packing aman. Hanya saja pengiriman agak lambat.' }
-                            ]
-                        },
-                        {
-                            id: 'p2',
-                            name: 'kriuke rasa coklat',
-                            subtitle: 'Promo Spesial: lumer coklat premium.',
-                            price: 20000, 
-                            originalPrice: 28000, // Harga normal ditambahkan
-                            rating: 4.7,
-                            category: 'Promo Spesial', 
-                            images: [
-                                'https://placehold.co/300x300/795548/FFFFFF?text=Coklat+Pack',
-                                'https://placehold.co/300x300/795548/FFFFFF?text=Coklat+Detail'
-                            ],
-                            description: 'Promo Spesial! Kripik pisang renyah dibalut dengan coklat premium yang lumer di mulut. Kriuknya beda, rasanya istimewa!',
-                            isLiked: false,
-                            reviews: [
-                                { user: 'Citra', rating: 5, date: '01/06/2025', comment: 'Coklatnya tebal! Harga promo sangat worth it. Anak-anak suka sekali.' },
-                                { user: 'Dedi', rating: 4, date: '05/06/2025', comment: 'Enak, tapi sedikit terlalu manis untuk saya. Overall bagus!' }
-                            ]
-                        },
-                        {
-                            id: 'p3',
-                            name: 'kripik pisang rasa balado',
-                            subtitle: 'Pedas manis bumbu balado khas.',
-                            price: 18000,
-                            rating: 4.5,
-                            category: 'Pedas', 
-                            images: [
-                                'https://placehold.co/300x300/F44336/FFFFFF?text=Balado+Pack'
-                            ],
-                            description: 'Sensasi pedas manis bumbu balado khas yang bikin ketagihan. Dibuat dari cabai pilihan dan bumbu rempah Indonesia. Berani coba?',
-                            isLiked: false,
-                            reviews: [
-                                { user: 'Eka', rating: 5, date: '15/05/2025', comment: 'Pedasnya pas dan bumbunya melimpah! Bikin nagih, harus coba rasa ini.' }
-                            ]
-                        },
-                        {
-                            id: 'p4',
-                            name: 'kriuke rasa pedas manis',
-                            subtitle: 'Manis gula aren dan sensasi pedas hangat.',
-                            price: 19000,
-                            rating: 4.9,
-                            category: 'Manis', 
-                            images: [
-                                'https://placehold.co/300x300/D32F2F/FFFFFF?text=Pedas+Manis+Pack'
-                            ],
-                            description: 'Perpaduan sempurna antara rasa manis gula aren dan sensasi pedas yang hangat. Rasa yang pasti disukai semua orang!',
-                            isLiked: false,
-                            reviews: [
-                                { user: 'Fani', rating: 5, date: '20/05/2025', comment: 'Gilaa ini enak banget, perpaduan manis dan pedasnya seimbang.' },
-                                { user: 'Gatot', rating: 5, date: '22/05/2025', comment: 'Selalu beli yang ini. Terbaikkkk.' }
-                            ]
-                        },
-                        {
-                            id: 'p5',
-                            name: 'kripik pisang rasa matcha',
-                            subtitle: 'Untuk pecinta teh hijau Jepang.',
-                            price: 22000,
-                            rating: 4.6,
-                            category: 'Manis',
-                            images: [
-                                'https://placehold.co/300x300/4CAF50/FFFFFF?text=Matcha+Pack',
-                                'https://placehold.co/300x300/4CAF50/FFFFFF?text=Matcha+Detail'
-                            ],
-                            description: 'Bagi pecinta teh hijau! Kriuké dengan bubuk matcha asli Jepang, memberikan rasa manis pahit yang unik dan menenangkan.',
-                            isLiked: false,
-                            reviews: [] // Contoh produk tanpa ulasan
-                        },
-                        {
-                            id: 'p6',
-                            name: 'kriuke rasa sapi panggang',
-                            subtitle: 'Gurihnya bumbu sapi panggang premium.',
-                            price: 21000,
-                            rating: 4.3,
-                            category: 'Gurih',
-                            images: [
-                                'https://placehold.co/300x300/6D4C41/FFFFFF?text=Sapi+Panggang+Pack',
-                                'https://placehold.co/300x300/6D4C41/FFFFFF?text=Sapi+Panggang+Detail'
-                            ],
-                            description: 'Nikmati sensasi gurihnya bumbu sapi panggang premium dalam setiap gigitan kriuk. Cocok untuk Anda yang suka rasa asin dan gurih.',
-                            isLiked: false,
-                            reviews: [
-                                { user: 'Hana', rating: 4, date: '01/07/2025', comment: 'Rasa gurih yang mantap! Cocok buat teman nonton bola.' }
-                            ]
-                        }
+                        { id: 'p1', name: 'kripik pisang rasa original', subtitle: 'Gurih alami, kriuknya beda.', price: 25000, rating: 4.8, category: 'Keripik Pisang', images: ['https://placehold.co/300x300/FEE300/000000?text=Original+Pack', 'https://placehold.co/300x300/8D6E63/FFFFFF?text=Original+Detail'], description: 'Kripik pisang renyah dengan rasa asli pisang yang gurih alami. Cocok untuk semua kalangan dan camilan harian Anda. Kriuknya beda, rasanya istimewa!', isLiked: false, reviews: [{ user: 'Ani', rating: 5, date: '10/05/2025', comment: 'Rasa original yang selalu bikin kangen! Kriuknya pas, tidak terlalu manis.' }, { user: 'Budi', rating: 4, date: '12/05/2025', comment: 'Kualitas oke, packing aman. Hanya saja pengiriman agak lambat.' }] },
+                        { id: 'p2', name: 'kriuke rasa coklat', subtitle: 'Promo Spesial: lumer coklat premium.', price: 20000, originalPrice: 28000, rating: 4.7, category: 'Promo Spesial', images: ['https://placehold.co/300x300/795548/FFFFFF?text=Coklat+Pack', 'https://placehold.co/300x300/795548/FFFFFF?text=Coklat+Detail'], description: 'Promo Spesial! Kripik pisang renyah dibalut dengan coklat premium yang lumer di mulut. Kriuknya beda, rasanya istimewa!', isLiked: false, reviews: [{ user: 'Citra', rating: 5, date: '01/06/2025', comment: 'Coklatnya tebal! Harga promo sangat worth it. Anak-anak suka sekali.' }, { user: 'Dedi', rating: 4, date: '05/06/2025', comment: 'Enak, tapi sedikit terlalu manis untuk saya. Overall bagus!' }] },
+                        { id: 'p3', name: 'kripik pisang rasa balado', subtitle: 'Pedas manis bumbu balado khas.', price: 18000, rating: 4.5, category: 'Pedas', images: ['https://placehold.co/300x300/F44336/FFFFFF?text=Balado+Pack'], description: 'Sensasi pedas manis bumbu balado khas yang bikin ketagihan. Dibuat dari cabai pilihan dan bumbu rempah Indonesia. Berani coba?', isLiked: false, reviews: [{ user: 'Eka', rating: 5, date: '15/05/2025', comment: 'Pedasnya pas dan bumbunya melimpah! Bikin nagih, harus coba rasa ini.' }] },
+                        { id: 'p4', name: 'kriuke rasa pedas manis', subtitle: 'Manis gula aren dan sensasi pedas hangat.', price: 19000, rating: 4.9, category: 'Manis', images: ['https://placehold.co/300x300/D32F2F/FFFFFF?text=Pedas+Manis+Pack'], description: 'Perpaduan sempurna antara rasa manis gula aren dan sensasi pedas yang hangat. Rasa yang pasti disukai semua orang!', isLiked: false, reviews: [{ user: 'Fani', rating: 5, date: '20/05/2025', comment: 'Gilaa ini enak banget, perpaduan manis dan pedasnya seimbang.' }, { user: 'Gatot', rating: 5, date: '22/05/2025', comment: 'Selalu beli yang ini. Terbaikkkk.' }] },
+                        { id: 'p5', name: 'kripik pisang rasa matcha', subtitle: 'Untuk pecinta teh hijau Jepang.', price: 22000, rating: 4.6, category: 'Manis', images: ['https://placehold.co/300x300/4CAF50/FFFFFF?text=Matcha+Pack', 'https://placehold.co/300x300/4CAF50/FFFFFF?text=Matcha+Detail'], description: 'Bagi pecinta teh hijau! Kriuké dengan bubuk matcha asli Jepang, memberikan rasa manis pahit yang unik dan menenangkan.', isLiked: false, reviews: [] },
+                        { id: 'p6', name: 'kriuke rasa sapi panggang', subtitle: 'Gurihnya bumbu sapi panggang premium.', price: 21000, rating: 4.3, category: 'Gurih', images: ['https://placehold.co/300x300/6D4C41/FFFFFF?text=Sapi+Panggang+Pack', 'https://placehold.co/300x300/6D4C41/FFFFFF?text=Sapi+Panggang+Detail'], description: 'Nikmati sensasi gurihnya bumbu sapi panggang premium dalam setiap gigitan kriuk. Cocok untuk Anda yang suka rasa asin dan gurih.', isLiked: false, reviews: [{ user: 'Hana', rating: 4, date: '01/07/2025', comment: 'Rasa gurih yang mantap! Cocok buat teman nonton bola.' }] }
                     ];
                     saveProducts();
                 }
@@ -1575,8 +1775,10 @@
                     isLoggedIn = true;
                     loginError.textContent = '';
                     loginForm.reset();
+                    renderAdminSettings(); 
                     renderAdminCategoryList();
                     renderAdminPromoList(); 
+                    renderAdminPromoSlideList(); // BARU
                     renderAdminList();
                     navigate('page-admin');
                 } else {
@@ -1590,7 +1792,6 @@
                 navigate('page-login');
             }
             
-            // FUNGSI BARU: Mengatur visibilitas input Harga Normal
             function toggleOriginalPriceInput(category) {
                 if (category === 'Promo Spesial') {
                     originalPriceContainer.classList.remove('hidden');
@@ -1598,7 +1799,7 @@
                 } else {
                     originalPriceContainer.classList.add('hidden');
                     productOriginalPriceInput.removeAttribute('required');
-                    productOriginalPriceInput.value = ''; // Clear value if not promo
+                    productOriginalPriceInput.value = ''; 
                 }
             }
 
@@ -1608,10 +1809,10 @@
                 productIdInput.value = '';
                 productSubtitleInput.value = '';
                 productImagesInput.value = ''; 
-                productOriginalPriceInput.value = ''; // Reset price
+                productOriginalPriceInput.value = ''; 
                 
                 const defaultCategory = categories.includes('Keripik Pisang') ? 'Keripik Pisang' : '';
-                renderCategoryOptions(defaultCategory); // Ini akan memanggil toggleOriginalPriceInput
+                renderCategoryOptions(defaultCategory); 
                 
                 navigate('page-edit');
             }
@@ -1629,10 +1830,9 @@
                 productImagesInput.value = product.images.join(', ');
                 productDescInput.value = product.description;
                 
-                // Set Original Price Input (hanya jika ada)
                 productOriginalPriceInput.value = product.originalPrice || '';
                 
-                renderCategoryOptions(product.category); // Ini akan memanggil toggleOriginalPriceInput
+                renderCategoryOptions(product.category); 
                 
                 navigate('page-edit');
             }
@@ -1668,11 +1868,10 @@
                     category: selectedCategory,
                     subtitle: productSubtitleInput.value.trim() || '',
                     price: price,
-                    originalPrice: originalPrice, // Simpan harga asli
+                    originalPrice: originalPrice, 
                     rating: newRating,
                     images: productImagesInput.value.split(',').map(url => url.trim()).filter(url => url),
                     description: productDescInput.value,
-                    // Pertahankan ulasan yang sudah ada saat mengedit
                     reviews: id ? (products.find(p => p.id === id)?.reviews || []) : [] 
                 };
 
@@ -1682,11 +1881,9 @@
                 }
 
                 if (id) {
-                    // Edit produk
                     const index = products.findIndex(p => p.id === id);
                     products[index] = { ...products[index], ...productData };
                 } else {
-                    // Tambah produk baru
                     productData.id = 'p' + (new Date().getTime());
                     products.push(productData);
                 }
@@ -1711,7 +1908,6 @@
                 products = products.filter(p => p.id !== deletedProductId);
                 saveProducts();
                 
-                // Hapus dari keranjang dan favorit
                 cart = cart.filter(item => item.id !== deletedProductId);
                 saveCart();
                 likedProducts = likedProducts.filter(id => id !== deletedProductId);
@@ -1734,7 +1930,6 @@
                     adminProductList.innerHTML = '<p class="text-gray-500 text-center">Belum ada produk.</p>';
                     return;
                 }
-                // Urutkan berdasarkan ID (terbaru di atas)
                 [...products].sort((a, b) => b.id.localeCompare(a.id)).forEach(product => {
                     const item = document.createElement('div');
                     item.className = 'flex items-center justify-between bg-white p-3 rounded-lg shadow-sm border';
@@ -1781,14 +1976,13 @@
                 });
             }
             
-            // === FUNGSI ADMIN PROMO CODE ===
+            // === FUNGSI ADMIN PROMO CODE (Dipertahankan) ===
 
             function loadPromoCodes() {
                 const storedPromoCodes = localStorage.getItem('kriuke_promo_codes');
                 if (storedPromoCodes) {
                     promoCodes = JSON.parse(storedPromoCodes);
                 } else {
-                    // Data awal default
                     promoCodes = {
                         'KRIUKHEMAT': { type: 'percent', value: 10, description: 'Diskon 10% untuk total belanja' },
                         'DISKON10K': { type: 'fixed', value: 10000, description: 'Potongan harga Rp 10.000' },
@@ -1817,7 +2011,7 @@
                 promoFormTitle.textContent = 'Tambah Kode Promo Baru';
                 promoFormError.textContent = '';
                 promoTypeSelect.addEventListener('change', updatePromoValueHint);
-                updatePromoValueHint(); // Set default hint
+                updatePromoValueHint();
 
                 if (code) {
                     const promo = promoCodes[code];
@@ -1850,30 +2044,20 @@
                     return;
                 }
                 
-                // Validasi duplikasi kode (kecuali jika sedang mengedit kodenya sendiri)
                 if (newCode !== originalCode && promoCodes.hasOwnProperty(newCode)) {
                     promoFormError.textContent = `Kode promo "${newCode}" sudah ada!`;
                     return;
                 }
                 
-                // Hapus kode lama jika kode diubah
                 if (originalCode && originalCode !== newCode) {
                     delete promoCodes[originalCode];
-                    // Jika promo yang diubah sedang diterapkan di keranjang, hapus penerapannya
                     if (appliedPromo === originalCode) {
                         appliedPromo = null;
                         promoCodeInput.value = '';
                         promoStatusText.textContent = '';
                     }
-                } else if (originalCode && newCode === originalCode) {
-                    // Edit tapi kode sama, lakukan update di tempat
-                } else if (!originalCode) {
-                    // Tambah baru
-                } else {
-                    return;
-                }
+                } 
                 
-                // Simpan atau update kode baru
                 promoCodes[newCode] = {
                     type: newType,
                     value: newValue,
@@ -1883,7 +2067,6 @@
                 savePromoCodes();
                 showToast(`Kode promo "${newCode}" berhasil disimpan.`);
                 renderAdminPromoList();
-                // Jika sedang di halaman keranjang, panggil update total
                 if (document.getElementById('page-cart').classList.contains('active')) {
                     updateCartTotalsUI();
                 }
@@ -1926,7 +2109,6 @@
                     promoListAdmin.appendChild(item);
                 });
                 
-                // Add event listeners for edit and delete buttons
                 document.querySelectorAll('.edit-promo-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         showPromoForm(e.currentTarget.dataset.code);
@@ -1954,7 +2136,7 @@
                 if (!promoCodeToDelete) return;
 
                 if (appliedPromo === promoCodeToDelete) {
-                    appliedPromo = null; // Hapus promo yang sedang diterapkan jika dihapus
+                    appliedPromo = null; 
                     promoCodeInput.value = '';
                     promoStatusText.textContent = '';
                     if (document.getElementById('page-cart').classList.contains('active')) {
@@ -1971,7 +2153,7 @@
                 promoCodeToDelete = null;
             }
 
-            // === FUNGSI KERANJANG & PROMO ===
+            // === FUNGSI KERANJANG & PROMO (Dipertahankan) ===
 
             function loadCart() {
                 const storedCart = localStorage.getItem('kriuke_cart');
@@ -1996,7 +2178,6 @@
                 }
             }
             
-            // Menghitung subtotal, diskon, dan total
             function calculateTotals() {
                 let subtotal = 0;
                 cart.forEach(item => {
@@ -2008,7 +2189,6 @@
 
                 let discount = 0;
                 let promoDetails = null;
-                // Menggunakan promoCodes state yang sudah diisi dari localStorage
                 if (appliedPromo && promoCodes[appliedPromo]) { 
                     promoDetails = promoCodes[appliedPromo];
                     if (promoDetails.type === 'percent') {
@@ -2016,7 +2196,6 @@
                     } else if (promoDetails.type === 'fixed') {
                         discount = promoDetails.value;
                     }
-                    // Batasi diskon maksimal sebesar subtotal
                     if (discount > subtotal) {
                         discount = subtotal;
                     }
@@ -2027,11 +2206,9 @@
                 return { subtotal, discount, total, promoDetails };
             }
 
-            // Memperbarui UI total di footer keranjang dan checkout
             function updateCartTotalsUI() {
                 const { subtotal, discount, total } = calculateTotals();
 
-                // 1. Perbarui Halaman Keranjang
                 cartSubtotalEl.textContent = `Rp${formatRupiah(subtotal)}`;
                 cartTotalEl.textContent = `Rp${formatRupiah(total)}`;
 
@@ -2043,7 +2220,6 @@
                 }
             }
             
-            // Logika saat tombol "Pakai" promo diklik
             function handleApplyPromo() {
                 const code = promoCodeInput.value.trim().toUpperCase();
                 
@@ -2055,17 +2231,17 @@
                     return;
                 }
 
-                if (promoCodes[code]) { // Cek dari state promoCodes yang baru
+                if (promoCodes[code]) { 
                     appliedPromo = code;
                     promoStatusText.textContent = `Kode "${code}" berhasil diterapkan! ${promoCodes[code].description}.`;
                     promoStatusText.className = 'text-sm mt-1.5 text-green-600';
-                    promoCodeInput.value = code; // Tampilkan kode yang diterapkan
+                    promoCodeInput.value = code; 
                     updateCartTotalsUI();
                 } else {
                     appliedPromo = null;
                     promoStatusText.textContent = 'Kode promo tidak valid.';
                     promoStatusText.className = 'text-sm mt-1.5 text-red-500';
-                    updateCartTotalsUI(); // Hitung ulang tanpa diskon
+                    updateCartTotalsUI(); 
                 }
             }
 
@@ -2083,7 +2259,6 @@
                             </button>
                         </div>
                     `;
-                    // Reset footer keranjang saat kosong
                     cartSubtotalEl.textContent = 'Rp0';
                     cartTotalEl.textContent = 'Rp0';
                     promoDiscountRow.classList.add('hidden');
@@ -2128,10 +2303,8 @@
                     cartItemsContainer.appendChild(itemEl);
                 });
 
-                // Panggil fungsi pembaruan total di akhir
                 updateCartTotalsUI();
 
-                // Add event listeners untuk tombol di keranjang
                 document.querySelectorAll('.cart-quantity-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const id = e.currentTarget.dataset.id;
@@ -2153,11 +2326,11 @@
                 if (item) {
                     item.quantity += change;
                     if (item.quantity <= 0) {
-                        handleCartRemove(id); // Ini akan memanggil renderCartPage
+                        handleCartRemove(id); 
                     } else {
                         saveCart();
                         updateCartBadge();
-                        renderCartPage(); // Render ulang untuk item & total
+                        renderCartPage(); 
                     }
                 }
             }
@@ -2166,10 +2339,9 @@
                 cart = cart.filter(item => item.id !== id);
                 saveCart();
                 updateCartBadge();
-                renderCartPage(); // Render ulang
+                renderCartPage(); 
             }
 
-            // FUNGSI CHECKOUT
             function renderCheckoutPage() {
                 if (cart.length === 0) {
                     navigate('page-cart');
@@ -2178,7 +2350,6 @@
                 
                 const { subtotal, discount, total, promoDetails } = calculateTotals();
                 
-                // Perbarui UI footer checkout
                 checkoutPageSubtotalEl.textContent = `Rp${formatRupiah(subtotal)}`;
                 checkoutPageTotalEl.textContent = `Rp${formatRupiah(total)}`;
 
@@ -2192,7 +2363,6 @@
                 checkoutError.textContent = '';
             }
 
-            // Pesan WA menyertakan info diskon
             function handleSendOrder(e) {
                 e.preventDefault();
                 checkoutError.textContent = '';
@@ -2212,7 +2382,6 @@
                     return;
                 }
 
-                // Ambil total dari fungsi kalkulasi
                 const { subtotal, discount, total, promoDetails } = calculateTotals();
 
                 let message = `Halo Kriuké Snack, saya mau pesan:\n\n`;
@@ -2234,7 +2403,6 @@
                     }
                 });
 
-                // Tambahkan Ringkasan Total, Subtotal, dan Diskon
                 message += `*RINGKASAN HARGA*\n`;
                 message += `Subtotal: Rp${formatRupiah(subtotal)}\n`;
                 if (discount > 0 && appliedPromo && promoDetails) {
@@ -2250,7 +2418,6 @@
                 
                 window.open(waUrl, '_blank');
 
-                // Kosongkan keranjang & promo setelah order dikirim
                 cart = [];
                 appliedPromo = null;
                 promoCodeInput.value = '';
@@ -2264,69 +2431,52 @@
             }
 
 
-            // === FUNGSI SLIDER PROMO (BARU) ===
+            // === FUNGSI SLIDER PROMO (Diubah menjadi Render) ===
             function startPromoSlider() {
-                const sliderContainer = document.getElementById('promo-slider-container');
-                if (!sliderContainer) return; // Keluar jika slider tidak ada di halaman
-
-                const slides = sliderContainer.querySelectorAll('.promo-slide');
-                if (slides.length <= 1) return; // Tidak perlu slider jika hanya 1 gambar atau tidak ada
-
-                let currentSlideIndex = 0;
-
-                setInterval(() => {
-                    const nextSlideIndex = (currentSlideIndex + 1) % slides.length;
-
-                    // Fade out slide saat ini
-                    slides[currentSlideIndex].classList.replace('opacity-100', 'opacity-0');
-                    // Fade in slide berikutnya
-                    slides[nextSlideIndex].classList.replace('opacity-0', 'opacity-100');
-                    
-                    currentSlideIndex = nextSlideIndex;
-                }, 3000); // Ganti slide setiap 3 detik
+                // Hapus logika timer karena sekarang adalah scrollable
             }
 
-
-            // === INISIALISASI & EVENT LISTENER ===
+            // INISIALISASI & EVENT LISTENER (Dipertahankan)
             
-            // Event listener untuk tombol Menu Toggle
             menuToggleBtn.addEventListener('click', () => toggleMenu(true));
             menuCloseBtn.addEventListener('click', () => toggleMenu(false));
             menuOverlay.addEventListener('click', () => toggleMenu(false));
             
-            // Event listener untuk form tambah kategori
             addCategoryForm.addEventListener('submit', handleAddCategory);
-            // Event listener untuk modal hapus kategori
             cancelCategoryDeleteBtn.addEventListener('click', () => deleteCategoryModal.classList.add('hidden'));
             confirmCategoryDeleteBtn.addEventListener('click', handleDeleteCategory); 
             
-            // Event listener untuk promo code
             addPromoBtn.addEventListener('click', () => showPromoForm());
             promoForm.addEventListener('submit', handlePromoFormSubmit);
             cancelPromoDeleteBtn.addEventListener('click', () => deletePromoModal.classList.add('hidden'));
             confirmPromoDeleteBtn.addEventListener('click', handleDeletePromo);
+            
+            tiktokLiveForm.addEventListener('submit', handleTikTokLiveForm);
+            
+            // Event Listener Slide Admin BARU
+            addSlideBtn.addEventListener('click', () => showSlideForm());
+            slideForm.addEventListener('submit', handleSlideFormSubmit);
+            cancelSlideDeleteBtn.addEventListener('click', () => deleteSlideModal.classList.add('hidden'));
+            confirmSlideDeleteBtn.addEventListener('click', handleDeleteSlide);
 
-            // Listener untuk mengubah visibilitas Harga Normal
+
             productCategorySelect.addEventListener('change', (e) => {
                 toggleOriginalPriceInput(e.target.value);
             });
 
-            // Search Input Listener
             document.getElementById('search-input').addEventListener('input', () => {
                 renderHomeProducts(activeCategory);
             });
 
-            // Navigasi (Menggunakan Event Delegation)
             document.body.addEventListener('click', (e) => {
                 const button = e.target.closest('.navigate-btn');
                 if (button) {
                     const target = button.dataset.target;
                     
-                    // Handle menu close and navigation
                     if (offCanvasMenu.contains(button) && target) {
                         toggleMenu(false);
                         setTimeout(() => {
-                            if (target === 'page-admin' || target === 'page-edit' || target === 'page-promo-edit' || target === 'page-login') {
+                            if (target === 'page-admin' || target === 'page-edit' || target === 'page-promo-edit' || target === 'page-slide-edit' || target === 'page-login') { // Tambah page-slide-edit
                                 navigate(isLoggedIn ? 'page-admin' : 'page-login');
                             } else {
                                 navigate(target);
@@ -2335,8 +2485,7 @@
                         return;
                     }
 
-                    // Logika navigasi normal
-                    if (target === 'page-admin' || target === 'page-edit' || target === 'page-promo-edit' || target === 'page-login') {
+                    if (target === 'page-admin' || target === 'page-edit' || target === 'page-promo-edit' || target === 'page-slide-edit' || target === 'page-login') { // Tambah page-slide-edit
                         navigate(isLoggedIn ? 'page-admin' : 'page-login');
                     } else {
                         navigate(target);
@@ -2344,7 +2493,6 @@
                 }
             });
 
-            // Admin
             loginForm.addEventListener('submit', handleLogin);
             logoutBtn.addEventListener('click', handleLogout);
             addNewBtn.addEventListener('click', showAddForm);
@@ -2353,34 +2501,32 @@
                 btn.addEventListener('click', () => navigate('page-admin'));
             });
 
-            // Delete Modal Produk
             cancelDeleteBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
             confirmDeleteBtn.addEventListener('click', handleDelete);
             
-            // Tombol "Lanjut ke Pengiriman"
             checkoutWaBtn.addEventListener('click', () => {
                 navigate('page-checkout');
             });
-            // Tombol "Kirim Pesanan" (Form Checkout)
             checkoutForm.addEventListener('submit', handleSendOrder);
             
-            // --- Event Listener Tombol Promo ---
             applyPromoBtn.addEventListener('click', handleApplyPromo);
             promoCodeInput.addEventListener('focus', () => {
-                promoStatusText.textContent = ''; // Hapus status saat fokus
+                promoStatusText.textContent = ''; 
                 promoStatusText.classList.remove('text-red-500', 'text-green-600');
             });
-            // ------------------------------------------
 
             // Load data awal dan render UI
+            loadSettings(); 
             loadCategories();
             loadPromoCodes(); 
             loadProducts();
+            loadPromoSlides(); // BARU: Muat slide promo
             loadCart(); 
+
+            renderHomePromoSlider(); // BARU: Render slider di Home
             renderCategoryFilters();
             renderHomeProducts();
-            startPromoSlider(); // Panggil fungsi slider (BARU)
-            navigate('page-home'); // Pastikan halaman awal adalah home
+            navigate('page-home'); 
         });
     </script>
 </body>
