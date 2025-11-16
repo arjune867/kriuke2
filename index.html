@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kriuké Snack</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Google Font (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- PWA Manifest (tetap) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF6B00">
+    <meta name="description" content="Kriuknya Beda, Rasanya Istimewa">
+    <link rel="apple-touch-icon" href="https://i.ibb.co.com/n86sQs1v/Logo-Toko-Aneka-Cemilan-Snack-Ceria-Oranye-Kuning-20251105_010226_0000.png">
+
+    <style>
+        /* Menggunakan font Inter sebagai default */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Kelas untuk menyembunyikan/menampilkan halaman */
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+
+        /* Sembunyikan scrollbar untuk container kategori */
+        #category-filter-container::-webkit-scrollbar {
+            display: none;
+        }
+        #category-filter-container {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Notifikasi Toast -->
+    <div id="toast-notification" class="fixed top-20 left-1/2 -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-[100]">
+        Item ditambahkan ke keranjang!
+    </div>
+
+    <!-- Kontainer utama aplikasi -->
+    <div class="max-w-md mx-auto min-h-screen bg-white shadow-lg">
+
+        <!-- ===== HALAMAN HOME (Diubah agar sesuai gambar) ===== -->
+        <div id="page-home" class="page active">
+            <!-- Header (Shopee-like, diubah) -->
+            <header class="sticky top-0 z-50 bg-white shadow-md p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <!-- Logo Kiri -->
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.ibb.co.com/n86sQs1v/Logo-Toko-Aneka-Cemilan-Snack-Ceria-Oranye-Kuning-20251105_010226-0000.png" alt="Kriuké Snack Logo" class="h-6 w-auto">
+                        <span class="text-lg font-bold text-orange-600">Kriuké</span>
+                    </div>
+                    
+                    <!-- Cart & Menu Kanan -->
+                    <div class="flex items-center gap-4">
+                        <!-- Cart Icon -->
+                        <button id="cart-icon-btn" class="navigate-btn text-2xl text-gray-700 relative" data-target="page-cart">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <span id="cart-count-badge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center opacity-0 transition-opacity">0</span>
+                        </button>
+                        <!-- Menu Icon (SEKARANG FUNGSIONAL) -->
+                        <button id="menu-toggle-btn" class="text-2xl text-gray-700">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="relative">
+                    <input type="text" id="search-input" class="w-full pl-10 pr-4 py-2 border border-gray-200 bg-gray-50 rounded-lg text-sm focus:ring-1 focus:ring-orange-500 focus:border-orange-500" placeholder="Cari produk...">
+                    <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </header>
+
+            <!-- Kategori Filter (Diubah gayanya) -->
+            <div class="px-4 py-3 border-b border-gray-200">
+                <div id="category-filter-container" class="flex gap-2 overflow-x-auto">
+                    <!-- Kategori akan di-render oleh JavaScript -->
+                </div>
+            </div>
+
+            <!-- Konten Utama -->
+            <main class="pb-20">
+                <!-- Product Grid (2 kolom) -->
+                <div id="product-grid" class="grid grid-cols-2 gap-3 p-3">
+                    <!-- Produk akan di-render oleh JavaScript di sini -->
+                </div>
+            </main>
+        </div>
+
+        <!-- ===== HALAMAN DETAIL PRODUK (Tetap) ===== -->
+        <div id="page-detail" class="page">
+            <header class="sticky top-0 z-50 bg-white shadow px-4 py-3 flex items-center">
+                <button class="navigate-btn text-xl" data-target="page-home">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="text-lg font-semibold ml-4">Detail Produk</h2>
+            </header>
+            
+            <main id="detail-content" class="pb-20">
+                <!-- Detail akan di-render oleh JavaScript di sini -->
+            </main>
+
+            <!-- Floating Action Button (Share & Add to Cart) - Diaktifkan jika page-detail aktif -->
+            <footer class="fixed bottom-16 left-1/2 -translate-x-1/2 max-w-md w-full p-4 flex justify-end gap-3 z-40">
+                <button id="share-btn" class="bg-blue-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-xl shadow-lg hover:bg-blue-600 transition-colors">
+                    <i class="fa-solid fa-share-alt"></i>
+                </button>
+                <button id="add-to-cart-btn" class="bg-orange-600 text-white h-14 px-6 rounded-full flex items-center justify-center font-semibold shadow-lg hover:bg-orange-700 transition-colors">
+                    <i class="fa-solid fa-cart-plus mr-2 text-xl"></i>
+                    Tambah ke Keranjang
+                </button>
+            </footer>
+        </div>
+        
+        <!-- ===== HALAMAN WHITELIST / FAVORIT (BARU) ===== -->
+        <div id="page-liked" class="page">
+            <header class="sticky top-0 z-50 bg-white shadow px-4 py-3 flex items-center">
+                <button class="navigate-btn text-xl" data-target="page-home">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="text-lg font-semibold ml-4">Whitelist Produk Favorit</h2>
+            </header>
+            <main id="liked-items-container" class="p-4 pb-20 grid grid-cols-2 gap-3">
+                <!-- Produk favorit akan di-render di sini oleh JavaScript -->
+            </main>
+        </div>
+
+        <!-- ===== HALAMAN KERANJANG (Tetap) ===== -->
+        <div id="page-cart" class="page">
+            <header class="sticky top-0 z-50 bg-white shadow px-4 py-3 flex items-center">
+                <button class="navigate-btn text-xl" data-target="page-home">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="text-lg font-semibold ml-4">Keranjang Saya</h2>
+            </header>
+            <main id="cart-items-container" class="p-4 pb-40">
+                <!-- Item keranjang akan di-render di sini -->
+            </main>
+            <footer class="fixed bottom-16 left-1/2 -translate-x-1/2 max-w-md w-full p-4 bg-white border-t z-40">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-gray-700 font-medium">Total:</span>
+                    <span id="cart-total" class="text-2xl font-bold text-orange-600">Rp0</span>
+                </div>
+                <button id="checkout-wa-btn" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold shadow-lg hover:bg-green-600 transition-colors">
+                    <i class="fa-solid fa-file-invoice mr-2"></i>
+                    Lanjut ke Pengiriman
+                </button>
+            </footer>
+        </div>
+
+        <!-- ===== HALAMAN CHECKOUT / DATA PENGIRIMAN (Tetap) ===== -->
+        <div id="page-checkout" class="page">
+            <header class="sticky top-0 z-50 bg-white shadow px-4 py-3 flex items-center">
+                <button class="navigate-btn text-xl" data-target="page-cart">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="text-lg font-semibold ml-4">Data Pengiriman</h2>
+            </header>
+            <main class="p-4 pb-40">
+                <form id="checkout-form">
+                    <div class="mb-4">
+                        <label for="checkout-name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                        <input type="text" id="checkout-name" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="checkout-wa" class="block text-sm font-medium text-gray-700 mb-1">Nomor WhatsApp</label>
+                        <input type="tel" id="checkout-wa" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="Contoh: 08123456789" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="checkout-address" class="block text-sm font-medium text-gray-700 mb-1">Alamat Lengkap</label>
+                        <textarea id="checkout-address" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="Sertakan nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan, kota/kab, dan kode pos." required></textarea>
+                    </div>
+                    <div class="mb-6">
+                        <label for="checkout-notes" class="block text-sm font-medium text-gray-700 mb-1">Catatan (opsional)</label>
+                        <textarea id="checkout-notes" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="Contoh: Pagar warna hijau"></textarea>
+                    </div>
+                    <!-- Error message placeholder -->
+                    <p id="checkout-error" class="text-red-500 text-sm text-center mb-4"></p>
+                </form>
+            </main>
+            <footer class="fixed bottom-16 left-1/2 -translate-x-1/2 max-w-md w-full p-4 bg-white border-t z-40">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-gray-700 font-medium">Total:</span>
+                    <span id="checkout-page-total" class="text-2xl font-bold text-orange-600">Rp0</span>
+                </div>
+                <!-- Tombol submit sekarang ada di dalam form -->
+                <button type="submit" form="checkout-form" id="send-order-wa-btn" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold shadow-lg hover:bg-green-600 transition-colors">
+                    <i class="fa-brands fa-whatsapp mr-2 text-xl"></i>
+                    Kirim Pesanan via WhatsApp
+                </button>
+            </footer>
+        </div>
+
+        <!-- ===== HALAMAN LOGIN ADMIN (Tetap) ===== -->
+        <div id="page-login" class="page">
+            <header class="sticky top-0 z-50 bg-white shadow px-4 py-3">
+                <h2 class="text-lg font-semibold text-center">Login Admin</h2>
+            </header>
+            <main class="p-6 pt-10">
+                <img src="https://i.ibb.co.com/n86sQs1v/Logo-Toko-Aneka-Cemilan-Snack-Ceria-Oranye-Kuning-20251105-010226-0000.png" alt="Logo" class="w-32 mx-auto mb-6">
+                <form id="login-form">
+                    <div class="mb-4">
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                        <input type="text" id="username" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" required>
+                    </div>
+                    <button type="submit" class="w-full bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors">Login</button>
+                    <p id="login-error" class="text-red-500 text-sm text-center mt-4"></p>
+                </form>
+            </main>
+        </div>
+
+        <!-- ===== HALAMAN DASHBOARD ADMIN (Tetap) ===== -->
+        <div id="page-admin" class="page">
+            <header class="sticky top-0 z-50 bg-white shadow px-4 py-3 flex items-center justify-between">
+                <h2 class="text-lg font-semibold">Admin Dashboard</h2>
+                <button id="logout-btn" class="text-sm text-red-500 font-medium">Logout</button>
+            </header>
+            <main class="p-4 pb-20">
+                <button id="add-new-btn" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold mb-6 hover:bg-green-600 transition-colors">
+                    <i class="fa-solid fa-plus mr-2"></i> Tambah Produk Baru
+                </button>
+                <h3 class="font-semibold text-gray-800 mb-3">Daftar Produk</h3>
+                <div id="admin-product-list" class="space-y-3">
+                    <!-- Daftar produk admin akan di-render di sini -->
+                </div>
+            </main>
+        </div>
+
+        <!-- ===== HALAMAN TAMBAH/EDIT PRODUK (Tetap) ===== -->
+        <div id="page-edit" class="page">
+            <header class="sticky top-0 z-50 bg-white shadow px-4 py-3 flex items-center">
+                <button class="cancel-edit-btn text-xl">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 id="form-title" class="text-lg font-semibold ml-4">Tambah Produk</h2>
+            </header>
+            <main class="p-4 pb-20">
+                <form id="product-form">
+                    <!-- Hidden input untuk menyimpan ID produk saat edit -->
+                    <input type="hidden" id="product-id">
+                    
+                    <div class="mb-4">
+                        <label for="product-name" class="block text-sm font-medium text-gray-700 mb-1">Nama Produk</label>
+                        <input type="text" id="product-name" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" required>
+                    </div>
+                    <!-- Kategori -->
+                    <div class="mb-4">
+                        <label for="product-category" class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                        <input type="text" id="product-category" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="Contoh: Pedas, Manis, Gurih" required>
+                    </div>
+                    <!-- Subtitle (BARU) -->
+                    <div class="mb-4">
+                        <label for="product-subtitle" class="block text-sm font-medium text-gray-700 mb-1">Sub Judul / Keterangan Singkat</label>
+                        <input type="text" id="product-subtitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="Kripik Pisang Rasa Original Kripik pisang...">
+                    </div>
+                    <div class="mb-4">
+                        <label for="product-price" class="block text-sm font-medium text-gray-700 mb-1">Harga (Angka)</label>
+                        <input type="number" id="product-price" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" required>
+                    </div>
+                    <!-- Input Rating -->
+                    <div class="mb-4">
+                        <label for="product-rating" class="block text-sm font-medium text-gray-700 mb-1">Rating (0.0 - 5.0)</label>
+                        <input type="number" id="product-rating" step="0.1" min="0" max="5" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" required>
+                    </div>
+                    <!-- Input Gambar Diubah ke Textarea -->
+                    <div class="mb-4">
+                        <label for="product-images" class="block text-sm font-medium text-gray-700 mb-1">URL Gambar (Pisahkan dengan koma)</label>
+                        <textarea id="product-images" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="https://.../gambar1.jpg, https://.../gambar2.jpg" required></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Gambar pertama akan menjadi gambar utama.</p>
+                    </div>
+                    <div class="mb-6">
+                        <label for="product-description" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                        <textarea id="product-description" rows="5" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" required></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors">Simpan Produk</button>
+                </form>
+            </main>
+        </div>
+
+        <!-- Bottom Navigation Bar (Diubah dari grid-cols-3 menjadi grid-cols-4) -->
+        <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 max-w-md w-full bg-white shadow-[0_-2px_6px_rgba(0,0,0,0.06)] border-t border-gray-200 grid grid-cols-4 z-50">
+            <!-- Home -->
+            <button class="nav-button-style navigate-btn text-center py-3 text-gray-600" data-target="page-home" data-default-color="text-gray-600" data-active-color="text-orange-600">
+                <i class="fa-solid fa-home text-2xl"></i>
+            </button>
+            <!-- Whitelist (BARU) -->
+            <button class="nav-button-style navigate-btn text-center py-3 text-gray-600" data-target="page-liked" data-default-color="text-gray-600" data-active-color="text-red-500">
+                <i class="fa-solid fa-heart text-2xl"></i>
+            </button>
+            <!-- Keranjang -->
+            <button class="nav-button-style navigate-btn text-center py-3 text-gray-600" data-target="page-cart" data-default-color="text-gray-600" data-active-color="text-orange-600">
+                 <i class="fa-solid fa-shopping-basket text-2xl"></i>
+            </button>
+            <!-- Admin (User Shield) -->
+            <button class="nav-button-style navigate-btn text-center py-3 text-gray-600" data-target="page-login" data-default-color="text-gray-600" data-active-color="text-orange-600">
+                <i class="fa-solid fa-user-shield text-2xl"></i>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Custom Modal for Delete Confirmation -->
+    <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full">
+            <h3 class="text-lg font-semibold mb-4">Konfirmasi Hapus</h3>
+            <p class="text-gray-600 mb-6">Apakah Anda yakin ingin menghapus produk ini?</p>
+            <div class="flex justify-end gap-3">
+                <button id="cancel-delete" class="px-4 py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300">Batal</button>
+                <button id="confirm-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700">Hapus</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Off-Canvas Menu (BARU) -->
+    <div id="off-canvas-menu" class="fixed inset-0 z-[100] hidden">
+        <!-- Overlay -->
+        <div id="menu-overlay" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity opacity-0"></div>
+        
+        <!-- Drawer -->
+        <div id="menu-drawer" class="absolute right-0 top-0 bottom-0 w-3/4 max-w-[300px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out p-6 overflow-y-auto">
+            <div class="flex justify-between items-center pb-4 border-b border-gray-200 mb-6">
+                <h3 class="text-xl font-bold text-orange-600">Menu Utama</h3>
+                <button id="menu-close-btn" class="text-2xl text-gray-700 hover:text-red-500">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <a href="#" class="menu-link navigate-btn block text-lg font-medium text-gray-700 hover:text-orange-600 transition-colors" data-target="page-home">
+                    <i class="fa-solid fa-home mr-3 w-5"></i> Home
+                </a>
+                <a href="#" class="menu-link navigate-btn block text-lg font-medium text-gray-700 hover:text-red-500 transition-colors" data-target="page-liked">
+                    <i class="fa-solid fa-heart mr-3 w-5"></i> Whitelist Favorit
+                </a>
+                <a href="#" class="menu-link navigate-btn block text-lg font-medium text-gray-700 hover:text-orange-600 transition-colors" data-target="page-cart">
+                    <i class="fa-solid fa-shopping-basket mr-3 w-5"></i> Keranjang
+                </a>
+                
+                <div class="pt-4 border-t border-gray-100"></div>
+
+                <!-- Dummy Links -->
+                <a href="#" class="menu-link block text-base text-gray-600 hover:text-gray-800 transition-colors">
+                    <i class="fa-solid fa-user-circle mr-3 w-5"></i> Profil Saya
+                </a>
+                <a href="#" class="menu-link block text-base text-gray-600 hover:text-gray-800 transition-colors">
+                    <i class="fa-solid fa-gear mr-3 w-5"></i> Pengaturan
+                </a>
+                <a href="#" class="menu-link block text-base text-gray-600 hover:text-gray-800 transition-colors">
+                    <i class="fa-solid fa-question-circle mr-3 w-5"></i> Bantuan
+                </a>
+                
+                <div class="pt-4 border-t border-gray-100"></div>
+
+                <a href="#" class="menu-link navigate-btn block text-lg font-medium text-gray-700 hover:text-orange-600 transition-colors" data-target="page-login">
+                    <i class="fa-solid fa-user-shield mr-3 w-5"></i> Admin Login
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // === STATE & KONSTANTA ===
+            let products = [];
+            let cart = [];
+            let isLoggedIn = false;
+            let activeCategory = 'Semua';
+            // Menambahkan state untuk produk yang disukai (BARU)
+            let likedProducts = JSON.parse(localStorage.getItem('kriuke_liked') || '[]');
+            const ADMIN_USER = 'arjune';
+            const ADMIN_PASS = 'kriuke123';
+            const WHATSAPP_NUMBER = '6282349786916';
+            let productToDeleteId = null;
+
+            // === REFERENSI DOM ===
+            const pages = document.querySelectorAll('.page');
+            // Nav button style diubah
+            const navButtons = document.querySelectorAll('.nav-button-style');
+            const productGrid = document.getElementById('product-grid');
+            const detailContent = document.getElementById('detail-content');
+            const categoryFilterContainer = document.getElementById('category-filter-container');
+            const loginForm = document.getElementById('login-form');
+            const loginError = document.getElementById('login-error');
+            const logoutBtn = document.getElementById('logout-btn');
+            const adminProductList = document.getElementById('admin-product-list');
+            const addNewBtn = document.getElementById('add-new-btn');
+            const productForm = document.getElementById('product-form');
+            const formTitle = document.getElementById('form-title');
+            const productIdInput = document.getElementById('product-id');
+            const productNameInput = document.getElementById('product-name');
+            const productCategoryInput = document.getElementById('product-category');
+            // Input Subtitle baru
+            const productSubtitleInput = document.getElementById('product-subtitle');
+            const productPriceInput = document.getElementById('product-price');
+            const productRatingInput = document.getElementById('product-rating');
+            const productImagesInput = document.getElementById('product-images');
+            const productDescInput = document.getElementById('product-description');
+            const cancelEditBtns = document.querySelectorAll('.cancel-edit-btn');
+            const shareBtn = document.getElementById('share-btn');
+            const deleteModal = document.getElementById('delete-modal');
+            const cancelDeleteBtn = document.getElementById('cancel-delete');
+            const confirmDeleteBtn = document.getElementById('confirm-delete');
+            
+            // Referensi Keranjang
+            const cartIconBtn = document.getElementById('cart-icon-btn');
+            const cartCountBadge = document.getElementById('cart-count-badge');
+            const cartItemsContainer = document.getElementById('cart-items-container');
+            const cartTotalEl = document.getElementById('cart-total');
+            const checkoutWaBtn = document.getElementById('checkout-wa-btn');
+            const addToCartBtn = document.getElementById('add-to-cart-btn');
+            const toastNotification = document.getElementById('toast-notification');
+
+            // Referensi Halaman Checkout
+            const checkoutForm = document.getElementById('checkout-form');
+            const checkoutPageTotalEl = document.getElementById('checkout-page-total');
+            const checkoutError = document.getElementById('checkout-error');
+
+            // Referensi Halaman Liked (BARU)
+            const likedItemsContainer = document.getElementById('liked-items-container');
+            
+            // Referensi Menu (BARU)
+            const menuToggleBtn = document.getElementById('menu-toggle-btn');
+            const offCanvasMenu = document.getElementById('off-canvas-menu');
+            const menuOverlay = document.getElementById('menu-overlay');
+            const menuDrawer = document.getElementById('menu-drawer');
+            const menuCloseBtn = document.getElementById('menu-close-btn');
+            const menuLinks = document.querySelectorAll('.menu-link');
+
+
+            // === FUNGSI UTILITAS (DIPINDAHKAN KE ATAS) ===
+
+            function formatRupiah(angka) {
+                return new Intl.NumberFormat('id-ID').format(angka);
+            }
+
+            function showToast(message) {
+                toastNotification.textContent = message;
+                toastNotification.classList.remove('opacity-0');
+                setTimeout(() => {
+                    toastNotification.classList.add('opacity-0');
+                }, 2000);
+            }
+
+            async function handleShare() {
+                const productName = shareBtn.dataset.name;
+                const url = window.location.href;
+                const text = `Cek produk keren ini: ${productName} dari Kriuké Snack! Kriuknya Beda, Rasanya Istimewa.`;
+
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: `Kriuké Snack - ${productName}`,
+                            text: text,
+                            url: url,
+                        });
+                    } catch (error) {
+                        console.error('Error sharing:', error);
+                    }
+                } else {
+                    // Fallback for non-supporting browsers
+                    navigator.clipboard.writeText(`${text} ${url}`).then(() => {
+                        showToast('Link berhasil disalin ke clipboard!');
+                    }).catch(err => {
+                        console.error('Could not copy text: ', err);
+                        // Fallback jika clipboard API gagal
+                        const dummy = document.createElement('textarea');
+                        document.body.appendChild(dummy);
+                        dummy.value = `${text} ${url}`;
+                        dummy.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(dummy);
+                        showToast('Link berhasil disalin ke clipboard!');
+                    });
+                }
+            }
+            
+            async function handleShareFromCard(id, name) {
+                const url = window.location.href;
+                const text = `Cek produk keren ini: ${name} dari Kriuké Snack! Kriuknya Beda, Rasanya Istimewa.`;
+
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: `Kriuké Snack - ${name}`,
+                            text: text,
+                            url: url,
+                        });
+                    } catch (error) {
+                         showToast('Gagal membagikan.');
+                    }
+                } else {
+                     navigator.clipboard.writeText(`${text} ${url}`).then(() => {
+                        showToast('Link berhasil disalin ke clipboard!');
+                    }).catch(err => {
+                        console.error('Could not copy text: ', err);
+                        const dummy = document.createElement('textarea');
+                        document.body.appendChild(dummy);
+                        dummy.value = `${text} ${url}`;
+                        dummy.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(dummy);
+                        showToast('Link berhasil disalin ke clipboard!');
+                    });
+                }
+            }
+            
+            // Fungsi inti penambahan ke keranjang (DIPINDAHKAN KE ATAS)
+            function handleCartAddition(id, quantity) {
+                const product = products.find(p => p.id === id);
+                if (!product) return;
+                
+                const existingItem = cart.find(item => item.id === id);
+                if (existingItem) {
+                    existingItem.quantity += quantity;
+                } else {
+                    cart.push({ id: id, quantity: quantity });
+                }
+
+                saveCart();
+                updateCartBadge();
+                showToast(`${product.name} ditambahkan ke keranjang!`);
+            }
+            
+            // FUNGSI MENU TOGGLE (BARU)
+            function toggleMenu(show) {
+                if (show) {
+                    offCanvasMenu.classList.remove('hidden');
+                    // Menggunakan setTimeout untuk memicu transisi setelah 'display: block'
+                    setTimeout(() => {
+                        menuOverlay.classList.remove('opacity-0');
+                        menuDrawer.classList.remove('translate-x-full');
+                    }, 10);
+                } else {
+                    menuOverlay.classList.add('opacity-0');
+                    menuDrawer.classList.add('translate-x-full');
+                    // Tunggu transisi selesai sebelum menyembunyikan kontainer
+                    setTimeout(() => {
+                        offCanvasMenu.classList.add('hidden');
+                    }, 300); 
+                }
+            }
+
+
+            // FUNGSI NAVIGASI
+            function navigate(pageId) {
+                // Sembunyikan semua halaman
+                pages.forEach(page => page.classList.remove('active'));
+                
+                // Tampilkan halaman yang dituju
+                const targetPage = document.getElementById(pageId);
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                    window.scrollTo(0, 0); // Scroll ke atas
+                }
+                
+                // Panggil fungsi render khusus
+                if (pageId === 'page-cart') {
+                    renderCartPage();
+                } else if (pageId === 'page-checkout') {
+                    renderCheckoutPage();
+                } else if (pageId === 'page-liked') { // BARU: Render halaman liked
+                    renderLikedPage();
+                }
+
+                // Update status aktif tombol navigasi bawah
+                navButtons.forEach(btn => {
+                    const target = btn.dataset.target;
+                    const isActivePage = (target === pageId) || 
+                                         (target === 'page-login' && (pageId === 'page-admin' || pageId === 'page-edit')) ||
+                                         (target === 'page-cart' && pageId === 'page-checkout') ||
+                                         (target === 'page-liked' && pageId === 'page-liked'); // BARU: Tambah cek untuk liked page
+
+                    // Hapus semua warna, lalu tambahkan warna aktif/default
+                    btn.classList.remove('text-orange-600', 'text-gray-600', 'text-red-500');
+                    if (isActivePage) {
+                        // Kasus khusus untuk page-liked (menggunakan merah)
+                        if (target === 'page-liked') {
+                            btn.classList.add('text-red-500');
+                        } else {
+                            btn.classList.add('text-orange-600'); 
+                        }
+                    } else {
+                        btn.classList.add('text-gray-600'); 
+                    }
+                });
+
+                // Update status ikon keranjang di header Home/Detail
+                if (pageId === 'page-cart' || pageId === 'page-checkout') {
+                    cartIconBtn.classList.add('text-orange-600');
+                    cartIconBtn.classList.remove('text-gray-700');
+                } else {
+                    cartIconBtn.classList.remove('text-orange-600');
+                    cartIconBtn.classList.add('text-gray-700');
+                }
+            }
+            
+            // FUNGSI DETAIL PRODUK (DIPINDAHKAN KE ATAS UNTUK MENGHINDARI REFERENCE ERROR)
+            function showProductDetail(id) {
+                const product = products.find(p => p.id === id);
+                if (!product) return;
+
+                // Build thumbnail HTML
+                let thumbnailHTML = '';
+                product.images.forEach((img, index) => {
+                    thumbnailHTML += `
+                        <img src="${img}" alt="thumbnail ${index + 1}" class="thumbnail-img w-16 h-16 object-cover rounded-md cursor-pointer border-2 ${index === 0 ? 'border-orange-500' : 'border-gray-200'}" data-img-src="${img}" onerror="this.src='https://placehold.co/64x64/FFECB3/000000?text=Error'">
+                    `;
+                });
+
+                detailContent.innerHTML = `
+                    <!-- Main Image -->
+                    <img id="main-product-image" src="${product.images[0]}" alt="${product.name}" class="w-full h-80 object-cover" onerror="this.src='https://placehold.co/400x256/FFECB3/000000?text=Error'">
+                    
+                    <!-- Thumbnails -->
+                    <div class="flex gap-2 p-4 overflow-x-auto">
+                        ${thumbnailHTML}
+                    </div>
+
+                    <div class="p-4 pt-0">
+                        <h2 class="text-2xl font-bold text-gray-900 capitalize">${product.name}</h2>
+                        <!-- Kontainer Harga & Rating (Diubah) -->
+                        <div class="flex items-center justify-between my-2">
+                            <p class="text-3xl font-bold text-red-600">Rp${formatRupiah(product.price)}</p>
+                            <div class="flex items-center gap-1 text-lg">
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <span class="font-bold text-gray-800">${product.rating}</span>
+                                <!-- Opsional: tambah jumlah terjual palsu agar terlihat lebih meyakinkan -->
+                                <span class="text-sm text-gray-500 ml-2">(1,2rb terjual)</span>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold mt-6 mb-2">Deskripsi Produk</h3>
+                        <p class="text-gray-700 whitespace-pre-wrap mb-6">${product.description}</p>
+
+                        <!-- ===== Tambahan Tombol Beli ===== -->
+                        <h3 class="text-lg font-semibold mt-6 mb-3">Beli Sekarang</h3>
+                        
+                        <!-- Tombol WhatsApp (Direct) -->
+                        <a href="https://wa.me/${WHATSAPP_NUMBER}" target="_blank" class="flex items-center justify-center w-full bg-green-500 text-white py-3 rounded-lg font-semibold shadow-lg hover:bg-green-600 transition-colors mb-4">
+                            <i class="fa-brands fa-whatsapp mr-2 text-xl"></i>
+                            Beli Langsung via WhatsApp
+                        </a>
+
+                        <!-- Link E-commerce -->
+                        <h4 class="font-semibold text-gray-800 mb-2 mt-5 text-sm">Atau beli di E-commerce:</h4>
+                        <div class="grid grid-cols-4 gap-3 text-center">
+                            <a href="#" class="block p-3 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                                <img src="https://i.ibb.co.com/399C2Fwj/social-media.png" alt="TikTok Shop" class="w-8 h-8 mx-auto rounded">
+                                <span class="text-xs font-medium mt-1 block">TikTok</span>
+                            </a>
+                            <a href="#" class="block p-3 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                                <img src="https://i.ibb.co.com/Vp32s5hK/shopee-seeklogo.png" alt="Shopee" class="w-8 h-8 mx-auto rounded">
+                                <span class="text-xs font-medium mt-1 block">Shopee</span>
+                            </a>
+                            <a href="#" class="block p-3 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                                <img src="https://i.ibb.co.com/fYb3fDrz/tokopedia-seeklogo.png" alt="Tokopedia" class="w-8 h-8 mx-auto rounded">
+                                <span class="text-xs font-medium mt-1 block">Tokopedia</span>
+                            </a>
+                            <a href="#" class="block p-3 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                                <img src="https://i.ibb.co.com/0VBH5vB9/lazada-seeklogo.png" alt="Lazada" class="w-8 h-8 mx-auto rounded">
+                                <span class="text-xs font-medium mt-1 block">Lazada</span>
+                            </a>
+                        </div>
+                        <!-- ===== Akhir Tambahan Tombol Beli ===== -->
+                    </div>
+                `;
+                
+                // Add event listeners untuk thumbnail
+                detailContent.querySelectorAll('.thumbnail-img').forEach(thumb => {
+                    thumb.addEventListener('click', (e) => {
+                        const newSrc = e.currentTarget.dataset.imgSrc;
+                        document.getElementById('main-product-image').src = newSrc;
+                        // Update active border
+                        detailContent.querySelectorAll('.thumbnail-img').forEach(t => t.classList.replace('border-orange-500', 'border-gray-200'));
+                        e.currentTarget.classList.replace('border-gray-200', 'border-orange-500');
+                    });
+                });
+                
+                // Set data-id untuk tombol share dan add to cart
+                shareBtn.dataset.id = product.id;
+                shareBtn.dataset.name = product.name;
+                addToCartBtn.dataset.id = product.id;
+                
+                navigate('page-detail');
+            }
+            
+            // === FUNGSI LIKE/DISLIKE ===
+            function saveLikedProducts() {
+                localStorage.setItem('kriuke_liked', JSON.stringify(likedProducts));
+            }
+
+            function handleToggleLike(id) {
+                const index = likedProducts.indexOf(id);
+                const button = document.querySelector(`.like-btn[data-id="${id}"] i`);
+                
+                if (index > -1) {
+                    // Unlike
+                    likedProducts.splice(index, 1);
+                    if(button) {
+                        button.classList.remove('fa-solid', 'text-red-500');
+                        button.classList.add('fa-regular', 'text-gray-300');
+                    }
+                    showToast('Produk dihapus dari favorit.');
+                } else {
+                    // Like
+                    likedProducts.push(id);
+                    if(button) {
+                        button.classList.remove('fa-regular', 'text-gray-300');
+                        button.classList.add('fa-solid', 'text-red-500');
+                    }
+                    showToast('Produk ditambahkan ke favorit!');
+                }
+                saveLikedProducts();
+                
+                // Jika sedang di halaman liked, re-render setelah unlike
+                if (document.getElementById('page-liked').classList.contains('active')) {
+                    renderLikedPage();
+                }
+            }
+            
+            // FUNGSI BARU: Render Halaman Whitelist
+            function renderLikedPage() {
+                likedItemsContainer.innerHTML = '';
+                // Filter produk yang ada di likedProducts
+                const likedProductsData = products.filter(p => likedProducts.includes(p.id));
+
+                if (likedProductsData.length === 0) {
+                    likedItemsContainer.innerHTML = `
+                        <div class="flex flex-col items-center justify-center text-center col-span-2 mt-10 p-4">
+                            <i class="fa-solid fa-heart-crack text-6xl text-gray-300 mb-4"></i>
+                            <h3 class="text-lg font-semibold text-gray-700">Daftar Favorit Anda Kosong</h3>
+                            <p class="text-gray-500 mb-6">Ayo, temukan kripik yang Anda suka!</p>
+                            <button class="navigate-btn bg-orange-600 text-white px-6 py-2 rounded-full font-semibold shadow hover:bg-orange-700" data-target="page-home">
+                                Kembali ke Home
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                likedProductsData.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'bg-white rounded-lg shadow-md overflow-hidden';
+                    
+                    // Struktur kartu yang dioptimalkan untuk halaman liked
+                    productCard.innerHTML = `
+                        <div class="relative cursor-pointer" data-id="${product.id}">
+                            <!-- Product Image -->
+                            <img src="${product.images[0]}" alt="${product.name}" class="w-full aspect-square object-cover" 
+                                onerror="this.src='https://placehold.co/100x100/FEE300/000000?text=Kriuké'">
+                            
+                            <!-- Remove from Whitelist Button (Solid red, calls handleToggleLike) -->
+                            <button data-id="${product.id}" class="unlike-btn absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:scale-105 transition-transform z-10">
+                                <i class="fa-solid fa-heart text-red-500 text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="p-3">
+                            <p class="text-xs ${product.category === 'Promo Spesial' ? 'text-red-500 font-bold' : 'text-gray-500'} mb-1 capitalize">${product.category}</p>
+                            <h4 class="text-base font-semibold text-gray-800 capitalize">${product.name}</h4>
+                            <p class="text-xl font-bold text-red-600 mb-3">Rp${formatRupiah(product.price)}</p>
+
+                            <div class="flex gap-2">
+                                <button data-id="${product.id}" class="add-to-cart-liked-btn w-full p-2 bg-orange-600 text-white rounded-lg shadow-md hover:bg-orange-700 transition-colors flex items-center justify-center text-sm">
+                                    <i class="fa-solid fa-shopping-cart mr-2"></i> Tambah ke Keranjang
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                    productCard.querySelector('.relative').addEventListener('click', () => showProductDetail(product.id));
+
+                    productCard.querySelector('.unlike-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        // Memanggil handleToggleLike akan menghapus dari list dan auto-re-render halaman ini
+                        handleToggleLike(product.id);
+                    });
+                    
+                    productCard.querySelector('.add-to-cart-liked-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        handleCartAddition(product.id, 1);
+                    });
+
+                    likedItemsContainer.appendChild(productCard);
+                });
+            }
+
+            // === FUNGSI RENDER HOME ===
+            function renderHomeProducts(filterCategory = 'Semua') {
+                productGrid.innerHTML = '';
+
+                // Filter produk berdasarkan kategori
+                const filteredProducts = (filterCategory === 'Semua')
+                    ? products
+                    : products.filter(p => p.category === filterCategory);
+
+                if (filteredProducts.length === 0) {
+                    productGrid.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-10">Tidak ada produk untuk kategori ini.</p>';
+                    return;
+                }
+                
+                filteredProducts.forEach(product => {
+                    // Cek status like
+                    const isLiked = likedProducts.includes(product.id);
+                    const likeIconClass = isLiked ? 'fa-solid text-red-500' : 'fa-regular text-gray-300'; // Menggunakan fa-regular untuk non-aktif
+                    
+                    const productCard = document.createElement('div');
+                    productCard.className = 'bg-white rounded-lg shadow-md overflow-hidden';
+                    
+                    // --- Kartu Produk (Sesuai Gambar) ---
+                    productCard.innerHTML = `
+                        <div class="relative cursor-pointer" data-id="${product.id}">
+                            <!-- Product Image -->
+                            <img src="${product.images[0]}" alt="${product.name}" class="w-full aspect-square object-cover" 
+                                onerror="this.src='https://placehold.co/100x100/FFECB3/000000?text=Kriuké'">
+                            
+                            <!-- Like Button -->
+                            <button data-id="${product.id}" class="like-btn absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:scale-105 transition-transform z-10">
+                                <i class="${likeIconClass} fa-heart text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="p-3">
+                            <!-- Category/Promo Badge (BARU) -->
+                            <p class="text-xs ${product.category === 'Promo Spesial' ? 'text-red-500 font-bold' : 'text-gray-500'} mb-1 capitalize">${product.category}</p>
+                            
+                            <!-- Product Name (Bold, Sesuai gambar) -->
+                            <h4 class="text-base font-semibold text-gray-800 capitalize">${product.name}</h4>
+                            
+                            <!-- Description/Sub-Title (Sesuai gambar) -->
+                            <p class="text-sm text-gray-600 mb-2 whitespace-nowrap overflow-hidden text-ellipsis">${product.subtitle || product.description.substring(0, 30) + '...'}</p>
+                            
+                            <!-- Price (Besar dan Merah/Orange) -->
+                            <p class="text-xl font-bold text-red-600 mb-3">Rp${formatRupiah(product.price)}</p>
+
+                            <!-- Action Buttons (Share and Cart) -->
+                            <div class="flex gap-2">
+                                <!-- Share Button (Left) -->
+                                <button data-id="${product.id}" data-name="${product.name}" class="share-card-btn w-1/4 p-2 bg-white border border-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-100 transition-colors flex items-center justify-center">
+                                    <i class="fa-solid fa-share-alt text-lg"></i>
+                                </button>
+                                <!-- Add to Cart Button (Right) -->
+                                <button data-id="${product.id}" class="add-to-cart-card-btn w-3/4 p-2 bg-orange-600 text-white rounded-lg shadow-md hover:bg-orange-700 transition-colors flex items-center justify-center">
+                                    <i class="fa-solid fa-shopping-cart text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Event listener untuk klik kartu (masuk ke detail)
+                    productCard.querySelector('.relative').addEventListener('click', () => showProductDetail(product.id));
+
+                    // Event listener untuk tombol Like
+                    productCard.querySelector('.like-btn').addEventListener('click', (e) => {
+                        e.stopPropagation(); // Mencegah klik kartu saat klik tombol like
+                        handleToggleLike(product.id);
+                    });
+
+                    // Event listener untuk tombol Share di card
+                    productCard.querySelector('.share-card-btn').addEventListener('click', (e) => {
+                         e.stopPropagation();
+                         handleShareFromCard(product.id, product.name);
+                    });
+                    
+                    // Event listener untuk tombol Add to Cart di card
+                    productCard.querySelector('.add-to-cart-card-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        handleAddToCartFromCard(product.id);
+                    });
+                    
+                    productGrid.appendChild(productCard);
+                });
+            }
+
+            // FUNGSI BARU: Render Filter Kategori (Diubah gayanya)
+            function renderCategoryFilters() {
+                // Tambahkan kategori "Promo Spesial" agar muncul di filter
+                const baseCategories = ['Semua', 'Keripik Pisang', 'Promo Spesial']; 
+                const dynamicCategories = products.map(p => p.category);
+                const uniqueCategories = [...new Set([...baseCategories, ...dynamicCategories])];
+                
+                categoryFilterContainer.innerHTML = ''; 
+
+                uniqueCategories.forEach(category => {
+                    const button = document.createElement('button');
+                    button.textContent = category;
+                    button.dataset.category = category;
+                    
+                    let styleClass;
+                    if (category === activeCategory) {
+                        // Gaya tombol aktif (solid orange)
+                        styleClass = 'bg-orange-600 text-white border-orange-600 shadow-md';
+                    } else {
+                        // Gaya tombol non-aktif (white, gray border)
+                        styleClass = 'bg-white text-gray-700 border-gray-300 shadow-sm';
+                    }
+
+                    button.className = `${styleClass} px-4 py-2 rounded-full text-sm font-medium border transition-colors whitespace-nowrap hover:shadow-md hover:border-orange-500`;
+                    
+                    button.addEventListener('click', () => {
+                        activeCategory = category; // Set state
+                        renderCategoryFilters(); // Re-render filter (untuk update style)
+                        renderHomeProducts(activeCategory); // Re-render produk
+                    });
+                    
+                    categoryFilterContainer.appendChild(button);
+                });
+            }
+
+
+            // === FUNGSI DATA & ADMIN ===
+            function loadProducts() {
+                const storedProducts = localStorage.getItem('kriuke_products');
+                if (storedProducts) {
+                    products = JSON.parse(storedProducts);
+                } else {
+                    // Data awal (Diperbarui agar sesuai gambar)
+                    products = [
+                        {
+                            id: 'p1',
+                            name: 'kripik pisang rasa original',
+                            subtitle: 'Kripik Pisang Rasa Original Kripik pisang...',
+                            price: 25000,
+                            rating: 4.8,
+                            category: 'Keripik Pisang',
+                            images: [
+                                'https://placehold.co/300x300/FEE300/000000?text=Original+Pack',
+                                'https://placehold.co/300x300/8D6E63/FFFFFF?text=Original+Detail'
+                            ],
+                            description: 'Kripik pisang renyah dengan rasa asli pisang yang gurih alami. Cocok untuk semua kalangan dan camilan harian Anda. Kripiknya beda, rasanya istimewa!',
+                            isLiked: false // BARU
+                        },
+                        {
+                            id: 'p2',
+                            name: 'kriuke rasa coklat',
+                            subtitle: 'Kripik Pisang Rasa Coklat Kripik pisang...',
+                            price: 20000, // Harga Promo
+                            rating: 4.7,
+                            category: 'Promo Spesial', // Diubah
+                            images: [
+                                'https://placehold.co/300x300/795548/FFFFFF?text=Coklat+Pack',
+                                'https://placehold.co/300x300/795548/FFFFFF?text=Coklat+Detail'
+                            ],
+                            description: 'Promo Spesial! Kripik pisang renyah dibalut dengan coklat premium yang lumer di mulut. Kriuknya beda, rasanya istimewa!',
+                            isLiked: false // BARU
+                        },
+                        {
+                            id: 'p3',
+                            name: 'kripik pisang rasa balado',
+                            subtitle: 'Kripik Pisang Rasa Balado Kripik pisang...',
+                            price: 18000,
+                            rating: 4.5,
+                            category: 'Keripik Pisang',
+                            images: [
+                                'https://placehold.co/300x300/F44336/FFFFFF?text=Balado+Pack'
+                            ],
+                            description: 'Sensasi pedas manis bumbu balado khas yang bikin ketagihan. Dibuat dari cabai pilihan dan bumbu rempah Indonesia. Berani coba?',
+                            isLiked: false // BARU
+                        },
+                        {
+                            id: 'p4',
+                            name: 'rasa manis pedas manis',
+                            subtitle: 'Kripik Pisang Rasa Pedas Manis Kripik pisang...',
+                            price: 19000,
+                            rating: 4.9,
+                            category: 'Keripik Pisang',
+                            images: [
+                                'https://placehold.co/300x300/D32F2F/FFFFFF?text=Pedas+Manis+Pack'
+                            ],
+                            description: 'Perpaduan sempurna antara rasa manis gula aren dan sensasi pedas yang hangat. Rasa yang pasti disukai semua orang!',
+                            isLiked: false // BARU
+                        }
+                    ];
+                    saveProducts();
+                }
+            }
+            
+            function saveProducts() {
+                localStorage.setItem('kriuke_products', JSON.stringify(products));
+            }
+
+            function handleLogin(e) {
+                e.preventDefault();
+                const username = loginForm.username.value;
+                const password = loginForm.password.value;
+
+                if (username === ADMIN_USER && password === ADMIN_PASS) {
+                    isLoggedIn = true;
+                    loginError.textContent = '';
+                    loginForm.reset();
+                    renderAdminList();
+                    navigate('page-admin');
+                } else {
+                    isLoggedIn = false;
+                    loginError.textContent = 'Username atau password salah!';
+                }
+            }
+
+            function handleLogout() {
+                isLoggedIn = false;
+                navigate('page-login');
+            }
+
+            function showAddForm() {
+                formTitle.textContent = 'Tambah Produk Baru';
+                productForm.reset();
+                productIdInput.value = '';
+                productSubtitleInput.value = ''; // BARU
+                productImagesInput.value = ''; 
+                navigate('page-edit');
+            }
+
+            function showEditForm(id) {
+                const product = products.find(p => p.id === id);
+                if (!product) return;
+
+                formTitle.textContent = 'Edit Produk';
+                productIdInput.value = product.id;
+                productNameInput.value = product.name;
+                productCategoryInput.value = product.category;
+                productSubtitleInput.value = product.subtitle || ''; // BARU
+                productPriceInput.value = product.price;
+                productRatingInput.value = product.rating;
+                productImagesInput.value = product.images.join(', ');
+                productDescInput.value = product.description;
+                navigate('page-edit');
+            }
+
+            function handleFormSubmit(e) {
+                e.preventDefault();
+                const id = productIdInput.value;
+                const newRating = parseFloat(productRatingInput.value);
+
+                if (isNaN(newRating) || newRating < 0 || newRating > 5) {
+                    showToast('Rating harus berupa angka antara 0 dan 5.');
+                    return;
+                }
+
+                const productData = {
+                    name: productNameInput.value,
+                    category: productCategoryInput.value.trim() || 'Lainnya',
+                    subtitle: productSubtitleInput.value.trim() || '', // BARU
+                    price: parseInt(productPriceInput.value),
+                    rating: newRating,
+                    images: productImagesInput.value.split(',').map(url => url.trim()).filter(url => url),
+                    description: productDescInput.value
+                };
+
+                if (productData.images.length === 0) {
+                    showToast('Masukkan setidaknya satu URL gambar.');
+                    return;
+                }
+
+                if (id) {
+                    // Edit produk
+                    const index = products.findIndex(p => p.id === id);
+                    products[index] = { ...products[index], ...productData };
+                } else {
+                    // Tambah produk baru
+                    productData.id = 'p' + (new Date().getTime()); // ID unik baru
+                    products.push(productData);
+                }
+
+                saveProducts();
+                renderHomeProducts(activeCategory);
+                renderCategoryFilters();
+                renderAdminList();
+                navigate('page-admin');
+            }
+
+            function showDeleteConfirmation(id) {
+                productToDeleteId = id;
+                deleteModal.classList.remove('hidden');
+            }
+
+            function handleDelete() {
+                if (!productToDeleteId) return;
+                products = products.filter(p => p.id !== productToDeleteId);
+                saveProducts();
+                
+                // Hapus dari keranjang dan liked list
+                cart = cart.filter(item => item.id !== productToDeleteId);
+                saveCart();
+                likedProducts = likedProducts.filter(id => id !== productToDeleteId);
+                saveLikedProducts();
+
+                updateCartBadge();
+                
+                renderHomeProducts(activeCategory);
+                renderCategoryFilters();
+                renderAdminList();
+                deleteModal.classList.add('hidden');
+                productToDeleteId = null;
+                navigate('page-admin');
+            }
+            
+            function renderAdminList() {
+                adminProductList.innerHTML = ''; // Kosongkan list
+                if (products.length === 0) {
+                    adminProductList.innerHTML = '<p class="text-gray-500 text-center">Belum ada produk.</p>';
+                    return;
+                }
+                [...products].reverse().forEach(product => {
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center justify-between bg-white p-3 rounded-lg shadow-sm border';
+                    item.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <img src="${product.images[0]}" alt="${product.name}" class="w-12 h-12 object-cover rounded" onerror="this.src='https://placehold.co/48x48/FFECB3/000000?text=Error'">
+                            <div class="flex-grow">
+                                <h4 class="font-medium capitalize">${product.name}</h4>
+                                <div class="flex items-center gap-2 mt-1 flex-wrap">
+                                    <p class="text-sm text-gray-600">Rp${formatRupiah(product.price)}</p>
+                                    <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">${product.category}</span>
+                                    <span class="flex items-center gap-1 text-xs text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full">
+                                        <i class="fa-solid fa-star fa-xs"></i>
+                                        ${product.rating}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="edit-btn p-2 text-blue-500 hover:text-blue-700" data-id="${product.id}">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="delete-btn p-2 text-red-500 hover:text-red-700" data-id="${product.id}">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    adminProductList.appendChild(item);
+                });
+
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.dataset.id;
+                        showEditForm(id);
+                    });
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.dataset.id;
+                        showDeleteConfirmation(id);
+                    });
+                });
+            }
+
+            // === FUNGSI KERANJANG ===
+
+            function loadCart() {
+                const storedCart = localStorage.getItem('kriuke_cart');
+                if (storedCart) {
+                    cart = JSON.parse(storedCart);
+                }
+                updateCartBadge();
+            }
+
+            function saveCart() {
+                localStorage.setItem('kriuke_cart', JSON.stringify(cart));
+            }
+
+            function updateCartBadge() {
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                if (totalItems > 0) {
+                    cartCountBadge.textContent = totalItems;
+                    cartCountBadge.classList.remove('opacity-0');
+                } else {
+                    cartCountBadge.textContent = '0';
+                    cartCountBadge.classList.add('opacity-0');
+                }
+            }
+            
+            // Diubah: Tombol Add to Cart di detail page
+            function handleAddToCart() {
+                 const id = addToCartBtn.dataset.id;
+                 handleCartAddition(id, 1);
+            }
+            
+            // BARU: Tombol Add to Cart di card
+            function handleAddToCartFromCard(id) {
+                 handleCartAddition(id, 1);
+            }
+
+
+            function renderCartPage() {
+                cartItemsContainer.innerHTML = '';
+                let total = 0;
+
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = `
+                        <div class="flex flex-col items-center justify-center text-center mt-10 p-4">
+                            <i class="fa-solid fa-cart-arrow-down text-6xl text-gray-300 mb-4"></i>
+                            <h3 class="text-lg font-semibold text-gray-700">Keranjang Anda Kosong</h3>
+                            <p class="text-gray-500 mb-6">Ayo, cari kripik favoritmu!</p>
+                            <button class="navigate-btn bg-orange-600 text-white px-6 py-2 rounded-full font-semibold shadow hover:bg-orange-700" data-target="page-home">
+                                Mulai Belanja
+                            </button>
+                        </div>
+                    `;
+                    cartTotalEl.textContent = 'Rp0';
+                    checkoutWaBtn.disabled = true;
+                    checkoutWaBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+                    checkoutWaBtn.classList.remove('hover:bg-green-600');
+                    return;
+                }
+                
+                checkoutWaBtn.disabled = false;
+                checkoutWaBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                checkoutWaBtn.classList.add('hover:bg-green-600');
+
+                cart.forEach(item => {
+                    const product = products.find(p => p.id === item.id);
+                    if (!product) return; // Skip if product is deleted
+
+                    const itemTotal = product.price * item.quantity;
+                    total += itemTotal;
+
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm border mb-3';
+                    itemEl.innerHTML = `
+                        <img src="${product.images[0]}" alt="${product.name}" class="w-16 h-16 object-cover rounded" onerror="this.src='https://placehold.co/64x64/FFECB3/000000?text=Error'">
+                        <div class="flex-grow">
+                            <h4 class="font-medium capitalize">${product.name}</h4>
+                            <p class="text-sm text-gray-600">Rp${formatRupiah(product.price)}</p>
+                            <p class="text-sm font-semibold text-orange-600">Subtotal: Rp${formatRupiah(itemTotal)}</p>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <div class="flex items-center border rounded-lg">
+                                <button class="cart-quantity-btn px-2 py-1 bg-gray-100 hover:bg-gray-200" data-id="${product.id}" data-change="-1">-</button>
+                                <span class="px-2 text-sm">${item.quantity}</span>
+                                <button class="cart-quantity-btn px-2 py-1 bg-gray-100 hover:bg-gray-200" data-id="${product.id}" data-change="1">+</button>
+                            </div>
+                            <button class="cart-remove-btn text-xs font-medium text-red-500 hover:underline mt-1" data-id="${product.id}">Hapus</button>
+                        </div>
+                    `;
+                    cartItemsContainer.appendChild(itemEl);
+                });
+
+                cartTotalEl.textContent = `Rp${formatRupiah(total)}`;
+
+                // Add event listeners untuk tombol di keranjang
+                document.querySelectorAll('.cart-quantity-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.dataset.id;
+                        const change = parseInt(e.currentTarget.dataset.change);
+                        handleCartQuantityChange(id, change);
+                    });
+                });
+
+                document.querySelectorAll('.cart-remove-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.dataset.id;
+                        handleCartRemove(id);
+                    });
+                });
+            }
+
+            function handleCartQuantityChange(id, change) {
+                const item = cart.find(item => item.id === id);
+                if (item) {
+                    item.quantity += change;
+                    if (item.quantity <= 0) {
+                        handleCartRemove(id);
+                    } else {
+                        saveCart();
+                        updateCartBadge();
+                        renderCartPage();
+                    }
+                }
+            }
+
+            function handleCartRemove(id) {
+                cart = cart.filter(item => item.id !== id);
+                saveCart();
+                updateCartBadge();
+                renderCartPage();
+            }
+
+            // FUNGSI CHECKOUT
+            function renderCheckoutPage() {
+                if (cart.length === 0) {
+                    navigate('page-cart');
+                    return;
+                }
+                let total = 0;
+                cart.forEach(item => {
+                    const product = products.find(p => p.id === item.id);
+                    if (product) {
+                        total += product.price * item.quantity;
+                    }
+                });
+                checkoutPageTotalEl.textContent = `Rp${formatRupiah(total)}`;
+                checkoutError.textContent = '';
+            }
+
+            function handleSendOrder(e) {
+                e.preventDefault();
+                checkoutError.textContent = '';
+
+                const nama = document.getElementById('checkout-name').value.trim();
+                const wa = document.getElementById('checkout-wa').value.trim();
+                const alamat = document.getElementById('checkout-address').value.trim();
+                const catatan = document.getElementById('checkout-notes').value.trim();
+
+                if (!nama || !wa || !alamat) {
+                    checkoutError.textContent = 'Mohon lengkapi Nama, Nomor WhatsApp, dan Alamat Lengkap.';
+                    return;
+                }
+
+                if (cart.length === 0) {
+                    checkoutError.textContent = 'Keranjang Anda kosong.';
+                    return;
+                }
+
+                let message = "Halo Kriuké Snack, saya mau pesan:\n\n";
+                message += "--- *Data Pengiriman* ---\n";
+                message += `Nama: *${nama}*\n`;
+                message += `No. WhatsApp: *${wa}*\n`;
+                message += `Alamat: *${alamat}*\n`;
+                if (catatan) {
+                    message += `Catatan: *${catatan}*\n`;
+                }
+                message += "\n--- *Detail Pesanan* ---\n";
+                
+                let total = 0;
+
+                cart.forEach(item => {
+                    const product = products.find(p => p.id === item.id);
+                    if (product) {
+                        message += `*${product.name}*\n`;
+                        message += `Jumlah: ${item.quantity} pcs\n`;
+                        message += `Subtotal: Rp${formatRupiah(product.price * item.quantity)}\n\n`;
+                        total += product.price * item.quantity;
+                    }
+                });
+
+                message += `*Total Pesanan: Rp${formatRupiah(total)}*\n\n`;
+                message += "Mohon konfirmasi pesanan saya. Terima kasih!";
+
+                const encodedMessage = encodeURIComponent(message);
+                const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+                
+                window.open(waUrl, '_blank');
+
+                // Kosongkan keranjang & kembali ke home
+                cart = [];
+                saveCart();
+                updateCartBadge();
+                checkoutForm.reset();
+                navigate('page-home');
+                showToast('Pesanan Anda sedang diproses!');
+            }
+
+
+            // === INISIALISASI & EVENT LISTENER ===
+            
+            // Event listener untuk tombol Menu Toggle (BARU)
+            menuToggleBtn.addEventListener('click', () => toggleMenu(true));
+            menuCloseBtn.addEventListener('click', () => toggleMenu(false));
+            menuOverlay.addEventListener('click', () => toggleMenu(false));
+
+            // Navigasi (Menggunakan Event Delegation)
+            document.body.addEventListener('click', (e) => {
+                const button = e.target.closest('.navigate-btn');
+                if (button) {
+                    const target = button.dataset.target;
+
+                    // Jika tombol yang diklik berada di dalam menu drawer, tutup menu terlebih dahulu
+                    if (offCanvasMenu.contains(button) && target) {
+                        // Tutup menu
+                        toggleMenu(false);
+                        
+                        // Handle navigasi setelah penutupan
+                        // Menggunakan setTimeout pendek untuk memastikan transisi penutupan tidak terganggu
+                        setTimeout(() => {
+                            if (target === 'page-admin' || target === 'page-edit' || target === 'page-login') {
+                                if (isLoggedIn) {
+                                    navigate('page-admin');
+                                } else {
+                                    navigate('page-login');
+                                }
+                            } else {
+                                navigate(target);
+                            }
+                        }, 50); // Delay 50ms untuk transisi visual
+                        return; // Hentikan proses navigasi normal untuk tombol di menu
+                    }
+
+
+                    // Logika navigasi normal (untuk tombol di nav bawah, header, dll)
+                    if (target === 'page-admin' || target === 'page-edit') {
+                        if (isLoggedIn) {
+                            navigate('page-admin');
+                        } else {
+                            navigate('page-login');
+                        }
+                    } else if (target === 'page-login') {
+                        if (isLoggedIn) {
+                            navigate('page-admin');
+                        } else {
+                            navigate('page-login');
+                        }
+                    } else {
+                        navigate(target);
+                    }
+                }
+            });
+
+            // Admin
+            loginForm.addEventListener('submit', handleLogin);
+            logoutBtn.addEventListener('click', handleLogout);
+            addNewBtn.addEventListener('click', showAddForm);
+            productForm.addEventListener('submit', handleFormSubmit);
+            cancelEditBtns.forEach(btn => {
+                btn.addEventListener('click', () => navigate('page-admin'));
+            });
+
+            // Delete Modal
+            cancelDeleteBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
+            confirmDeleteBtn.addEventListener('click', handleDelete);
+            
+            // Share (Detail Page)
+            shareBtn.addEventListener('click', handleShare);
+
+            // Keranjang (Detail Page)
+            addToCartBtn.addEventListener('click', handleAddToCart);
+            checkoutWaBtn.addEventListener('click', () => {
+                // Pergi ke halaman checkout
+                navigate('page-checkout');
+            });
+            checkoutForm.addEventListener('submit', handleSendOrder);
+
+            // Load data awal
+            loadProducts();
+            loadCart(); 
+            renderCategoryFilters();
+            renderHomeProducts();
+            navigate('page-home');
+        });
+    </script>
+</body>
+</html>
