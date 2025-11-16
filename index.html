@@ -16,6 +16,50 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Firebase SDKs (UPDATED for Firestore) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, collection, query, setDoc, deleteDoc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // GLOBAL VARIABLES (MUST BE INCLUDED FOR CANVAS)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        setLogLevel('debug'); // Enable debug logging
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Export necessary functions/objects to the global scope for use in the main script
+        window.firebase = {
+            db, auth, appId,
+            getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut,
+            doc, onSnapshot, collection, query, setDoc, deleteDoc, updateDoc, getDocs
+        };
+
+        // Custom Auth Setup
+        async function setupAuth() {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                    console.log("Firebase signed in with custom token.");
+                } else {
+                    await signInAnonymously(auth);
+                    console.log("Firebase signed in anonymously.");
+                }
+            } catch (error) {
+                console.error("Firebase Auth Error:", error);
+            }
+        }
+
+        setupAuth();
+    </script>
+
     <!-- PWA Manifest (tetap) -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#FF6B00">
@@ -47,7 +91,7 @@
         }
         
         /* Mengatur padding bawah untuk halaman agar tidak tertutup nav bottom dan footer baru */
-        #page-home main, #page-detail main, #page-liked main, #page-admin main, #page-login main, #page-edit main, #page-promo-edit main, #page-slide-edit main { /* #page-slide-edit BARU */
+        #page-home main, #page-detail main, #page-liked main, #page-admin main, #page-login main, #page-edit main, #page-promo-edit main, #page-slide-edit main, #page-category-edit main { /* Tambah #page-category-edit */
             /* Disesuaikan: 56px (nav bottom) + 144px (footer baru) = 200px */
             padding-bottom: 200px; 
         }
@@ -70,10 +114,13 @@
         }
 
         /* Tambahkan jarak horizontal yang baik antar slide */
-        #promo-slider-container > div {
+        #promo-slider-container > a {
             padding-left: 1rem;
         }
-        #promo-slider-container > div:last-child {
+        #promo-slider-container > a:first-child {
+            padding-left: 1rem;
+        }
+        #promo-slider-container > a:last-child {
             padding-right: 1rem;
         }
     </style>
@@ -295,12 +342,12 @@
                 <img src="https://i.ibb.co.com/n86sQs1v/Logo-Toko-Aneka-Cemilan-Snack-Ceria-Oranye-Kuning-20251105_010226_0000.png" alt="Logo" class="w-32 mx-auto mb-6">
                 <form id="login-form">
                     <div class="mb-4">
-                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                        <input type="text" id="username" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" required>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username (Admin)</label>
+                        <input type="text" id="username" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" value="arjune" required>
                     </div>
                     <div class="mb-6">
                         <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                        <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" required>
+                        <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" value="kriuke123" required>
                     </div>
                     <button type="submit" class="w-full bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors">Login</button>
                     <p id="login-error" class="text-red-500 text-sm text-center mt-4"></p>
@@ -347,7 +394,7 @@
                 <!-- KELOLA KATEGORI -->
                 <h3 class="font-semibold text-gray-800 mb-3 border-t pt-4 mt-6">Kelola Kategori Produk</h3>
                 <div class="bg-gray-50 p-3 rounded-lg mb-6 border border-gray-200">
-                    <div id="category-list-admin" class="flex flex-wrap gap-2 mb-3">
+                    <div id="category-list-admin" class="space-y-2 mb-3">
                         <!-- List kategori akan di-render di sini -->
                     </div>
                     <form id="add-category-form" class="flex gap-2">
@@ -513,6 +560,30 @@
                 <p id="slide-form-error" class="text-red-500 text-sm text-center mt-4"></p>
             </main>
         </div>
+        
+        <!-- ===== HALAMAN EDIT KATEGORI (BARU) ===== -->
+        <div id="page-category-edit" class="page">
+            <header class="sticky top-0 z-50 bg-white shadow px-4 py-3 flex items-center">
+                <button class="navigate-btn text-xl" data-target="page-admin">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 id="category-edit-form-title" class="text-lg font-semibold ml-4">Edit Kategori</h2>
+            </header>
+            <main class="p-4 pb-20">
+                <form id="category-edit-form">
+                    <input type="hidden" id="category-original-name">
+                    
+                    <div class="mb-4">
+                        <label for="category-new-name" class="block text-sm font-medium text-gray-700 mb-1">Nama Kategori Baru</label>
+                        <input type="text" id="category-new-name" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" required>
+                        <p class="text-xs text-gray-500 mt-1">Ubah nama untuk mengganti nama kategori ini.</p>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">Simpan Perubahan Kategori</button>
+                </form>
+                <p id="category-edit-form-error" class="text-red-500 text-sm text-center mt-4"></p>
+            </main>
+        </div>
 
 
         <!-- Bottom Navigation Bar -->
@@ -587,7 +658,7 @@
     </footer>
 
 
-    <!-- Custom Modal for Delete Confirmation -->
+    <!-- Custom Modals -->
     <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full">
             <h3 class="text-lg font-semibold mb-4">Konfirmasi Hapus</h3>
@@ -599,7 +670,6 @@
         </div>
     </div>
     
-    <!-- Custom Modal for Delete Category Confirmation -->
     <div id="delete-category-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full">
             <h3 class="text-lg font-semibold mb-4">Konfirmasi Hapus Kategori</h3>
@@ -611,7 +681,6 @@
         </div>
     </div>
 
-    <!-- Custom Modal for Delete Promo Confirmation (BARU) -->
     <div id="delete-promo-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full">
             <h3 class="text-lg font-semibold mb-4">Konfirmasi Hapus Promo</h3>
@@ -623,7 +692,6 @@
         </div>
     </div>
     
-    <!-- Custom Modal for Delete Slide Confirmation (BARU) -->
     <div id="delete-slide-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full">
             <h3 class="text-lg font-semibold mb-4">Konfirmasi Hapus Slide</h3>
@@ -634,7 +702,6 @@
             </div>
         </div>
     </div>
-
 
     
     <!-- Off-Canvas Menu -->
@@ -687,11 +754,37 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
+            // --- FIREBASE SETUP ---
+            let db, auth, appId;
+            // Declare Firestore utility functions to make them available in this script's scope
+            let doc, onSnapshot, collection, query, setDoc, deleteDoc, updateDoc, getDocs;
+            
+            if (window.firebase) {
+                // Destructure Firebase instances and utility functions into the local scope
+                ({ db, auth, appId, doc, onSnapshot, collection, query, setDoc, deleteDoc, updateDoc, getDocs } = window.firebase);
+                
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        // User is authenticated, potentially firestore ready
+                        console.log("Auth state changed. Firestore ready.");
+                        initializeAppLogic();
+                    } else {
+                        // Not authenticated (should not happen with auto anonymous sign in)
+                        console.log("Auth state pending/error.");
+                    }
+                });
+            } else {
+                // Fallback for non-Firebase environments (keeping the original localStorage logic for products/cart)
+                console.warn("Firebase not loaded. Using localStorage fallback.");
+                initializeAppLogic(true);
+            }
+
             // === STATE & KONSTANTA ===
             let products = [];
             let cart = [];
             let categories = [];
             let isLoggedIn = false;
+            let isFirestoreReady = false;
             let activeCategory = 'Semua';
             let likedProducts = JSON.parse(localStorage.getItem('kriuke_liked') || '[]');
             const ADMIN_USER = 'arjune';
@@ -699,9 +792,10 @@
             const WHATSAPP_NUMBER = '6282349786916';
             let productToDeleteId = null;
             let categoryToDelete = null;
+            let categoryToEditName = null; // Untuk menyimpan nama kategori yang sedang diedit
             
             let settings = {}; 
-            let promoSlides = []; // BARU: Data Slide Promo
+            let promoSlides = []; 
             
             // --- Logika Kode Promo ---
             let appliedPromo = null; 
@@ -709,7 +803,7 @@
             let promoCodeToDelete = null;
             // ---------------------------------
 
-            // VARIABEL UNTUK KONTROL SHARE (FIXED: Dideklarasikan di sini)
+            // VARIABEL UNTUK KONTROL SHARE
             let isSharing = false; 
             
             // === REFERENSI DOM ===
@@ -827,6 +921,15 @@
             const cancelSlideDeleteBtn = document.getElementById('cancel-slide-delete');
             const confirmSlideDeleteBtn = document.getElementById('confirm-slide-delete');
             let slideToDeleteId = null;
+            const slideFormError = document.getElementById('slide-form-error'); // FIX: Menambahkan referensi DOM yang hilang
+
+            // --- Referensi Edit Kategori (BARU) ---
+            const categoryEditForm = document.getElementById('category-edit-form');
+            const categoryEditFormTitle = document.getElementById('category-edit-form-title');
+            const categoryOriginalNameInput = document.getElementById('category-original-name');
+            const categoryNewNameInput = document.getElementById('category-new-name');
+            const categoryEditFormError = document.getElementById('category-edit-form-error');
+            // ---------------------------------------
 
             // === FUNGSI UTILITAS ===
 
@@ -842,27 +945,74 @@
                 }, 2000);
             }
             
-            // --- FUNGSI PENGATURAN GLOBAL ---
-            function loadSettings() {
-                const storedSettings = localStorage.getItem('kriuke_settings');
-                if (storedSettings) {
-                    settings = JSON.parse(storedSettings);
-                } else {
-                    settings = {
-                        tiktokLiveUrl: 'https://www.tiktok.com/@kriukesnack' 
-                    };
-                    saveSettings();
-                }
-                updateTikTokLiveLink();
+            // --- FIREBASE DATA LISTENERS & HANDLERS ---
+            function listenToFirestoreData() {
+                if (!db) return;
+
+                // 1. Settings (TikTok Live URL)
+                const settingsRef = doc(db, `artifacts/${appId}/public/data/settings`, 'store');
+                onSnapshot(settingsRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        settings = docSnap.data();
+                    } else {
+                        settings = { tiktokLiveUrl: 'https://www.tiktok.com/@kriukesnack' };
+                        setDoc(settingsRef, settings, { merge: true }).catch(e => console.error("Error setting default settings:", e));
+                    }
+                    updateTikTokLiveLink();
+                    if (isLoggedIn) renderAdminSettings();
+                });
+
+                // 2. Categories
+                const categoriesQuery = query(collection(db, `artifacts/${appId}/public/data/categories`));
+                onSnapshot(categoriesQuery, (snapshot) => {
+                    categories = snapshot.docs.map(doc => ({ id: doc.id, name: doc.data().name })).map(c => c.name);
+                    
+                    // Add default categories if empty (or ensure they exist if needed)
+                    const defaultCats = ['Keripik Pisang', 'Promo Spesial', 'Manis', 'Gurih', 'Pedas', 'Lainnya'];
+                    defaultCats.forEach(defaultCat => {
+                        if (!categories.includes(defaultCat)) {
+                            // Only load to list, not saving back default unless they edit.
+                            categories.push(defaultCat);
+                        }
+                    });
+
+                    renderCategoryFilters();
+                    if (isLoggedIn) renderAdminCategoryList();
+                });
+
+                // 3. Promo Codes
+                const promoCodesQuery = query(collection(db, `artifacts/${appId}/public/data/promo_codes`));
+                onSnapshot(promoCodesQuery, (snapshot) => {
+                    promoCodes = {};
+                    snapshot.docs.forEach(doc => {
+                        const data = doc.data();
+                        promoCodes[doc.id] = { type: data.type, value: data.value, description: data.description };
+                    });
+                    if (isLoggedIn) renderAdminPromoList();
+                    // Re-calculate cart totals if needed (e.g., if applied promo was deleted/changed)
+                    if (document.getElementById('page-cart').classList.contains('active')) {
+                        updateCartTotalsUI();
+                    }
+                });
+
+                // 4. Promo Slides
+                const slidesQuery = query(collection(db, `artifacts/${appId}/public/data/promo_slides`));
+                onSnapshot(slidesQuery, (snapshot) => {
+                    promoSlides = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderHomePromoSlider();
+                    if (isLoggedIn) renderAdminPromoSlideList();
+                });
+
+                // 5. Products (Keeping original localStorage for demo purposes, but moving towards Firestore if fully implemented)
+                loadProducts(); 
+
+                isFirestoreReady = true;
             }
 
-            function saveSettings() {
-                localStorage.setItem('kriuke_settings', JSON.stringify(settings));
-            }
-            
+            // --- FUNGSI PENGATURAN GLOBAL ---
             function updateTikTokLiveLink() {
-                if (tiktokLiveLinkEl) {
-                    tiktokLiveLinkEl.href = settings.tiktokLiveUrl || '#';
+                if (tiktokLiveLinkEl && settings.tiktokLiveUrl) {
+                    tiktokLiveLinkEl.href = settings.tiktokLiveUrl;
                 }
             }
             
@@ -872,36 +1022,38 @@
                 }
             }
 
-            function handleTikTokLiveForm(e) {
+            async function handleTikTokLiveForm(e) {
                 e.preventDefault();
-                const newUrl = tiktokLiveInput.value.trim();
+                if (!isFirestoreReady) return showToast("Data belum siap. Coba lagi.");
                 
-                settings.tiktokLiveUrl = newUrl;
-                saveSettings();
-                updateTikTokLiveLink();
-                showToast('Tautan TikTok Live berhasil diperbarui!');
+                const newUrl = tiktokLiveInput.value.trim();
+                const settingsRef = doc(db, `artifacts/${appId}/public/data/settings`, 'store');
+
+                try {
+                    await setDoc(settingsRef, { tiktokLiveUrl: newUrl }, { merge: true });
+                    showToast('Tautan TikTok Live berhasil diperbarui!');
+                } catch (e) {
+                    console.error("Error updating settings:", e);
+                    showToast('Gagal menyimpan tautan. Cek konsol.');
+                }
             }
             // --- AKHIR FUNGSI PENGATURAN GLOBAL ---
 
-            // --- FUNGSI PROMO SLIDE (BARU) ---
+            // --- FUNGSI PROMO SLIDE (DIUBAH KE FIRESTORE) ---
 
-            function loadPromoSlides() {
-                const storedSlides = localStorage.getItem('kriuke_promo_slides');
-                if (storedSlides) {
-                    promoSlides = JSON.parse(storedSlides);
-                } else {
-                    // Data default
-                    promoSlides = [
-                        { id: 's1', title: 'DISKON TERBATAS 20%', imageUrl: 'https://placehold.co/400x120/FF6B00/FFFFFF?text=Diskon+20%25', linkUrl: '#', isDefault: true },
-                        { id: 's2', title: 'PROMO GRATIS ONGKIR', imageUrl: 'https://placehold.co/400x120/4CAF50/FFFFFF?text=Gratis+Ongkir', linkUrl: '#', isDefault: true },
-                        { id: 's3', title: 'BELI 3 GRATIS 1!', imageUrl: 'https://placehold.co/400x120/F44336/FFFFFF?text=Beli+3+Gratis+1', linkUrl: '#', isDefault: true },
-                    ];
-                    savePromoSlides();
-                }
+            function savePromoSlidesToStore(slideData, id = null) {
+                if (!isFirestoreReady) return showToast("Data belum siap. Coba lagi.");
+                
+                const slideId = id || 's' + new Date().getTime();
+                const slideRef = doc(db, `artifacts/${appId}/public/data/promo_slides`, slideId);
+                
+                return setDoc(slideRef, slideData, { merge: true });
             }
 
-            function savePromoSlides() {
-                localStorage.setItem('kriuke_promo_slides', JSON.stringify(promoSlides));
+            async function deletePromoSlideFromStore(id) {
+                 if (!isFirestoreReady) return showToast("Data belum siap. Coba lagi.");
+                 const slideRef = doc(db, `artifacts/${appId}/public/data/promo_slides`, id);
+                 return deleteDoc(slideRef);
             }
 
             function renderHomePromoSlider() {
@@ -940,7 +1092,8 @@
                 }
                 
                 [...promoSlides].reverse().forEach(slide => {
-                    const isDefault = slide.isDefault;
+                    // isDefault is not needed if all data is managed via firestore, but keeping it for visibility
+                    const isDefault = slide.isDefault || false; 
                     const item = document.createElement('div');
                     item.className = 'flex items-center justify-between bg-white p-3 rounded-lg shadow-sm border border-red-200';
                     item.innerHTML = `
@@ -980,6 +1133,7 @@
                 slideForm.reset();
                 slideIdInput.value = '';
                 slideFormTitle.textContent = 'Tambah Slide Promo Baru';
+                if (slideFormError) slideFormError.textContent = ''; // FIX DITERAPKAN DI SINI
                 
                 if (id) {
                     const slide = promoSlides.find(s => s.id === id);
@@ -995,65 +1149,56 @@
                 navigate('page-slide-edit');
             }
 
-            function handleSlideFormSubmit(e) {
+            async function handleSlideFormSubmit(e) {
                 e.preventDefault();
+                if (!isFirestoreReady) return showToast("Data belum siap. Coba lagi.");
+
                 const id = slideIdInput.value;
                 const title = slideTitleInput.value.trim();
                 const imageUrl = slideImageUrlInput.value.trim();
-                const linkUrl = slideLinkUrlInput.value.trim();
+                const linkUrl = slideLinkUrlInput.value.trim() || null;
 
                 const slideData = {
                     title: title,
                     imageUrl: imageUrl,
-                    linkUrl: linkUrl || null,
-                    isDefault: false
+                    linkUrl: linkUrl,
                 };
-
-                if (id) {
-                    // Edit
-                    const index = promoSlides.findIndex(s => s.id === id);
-                    if (index !== -1) {
-                        promoSlides[index] = { ...promoSlides[index], ...slideData };
-                    }
-                } else {
-                    // Tambah baru
-                    slideData.id = 's' + (new Date().getTime());
-                    promoSlides.push(slideData);
+                
+                try {
+                    await savePromoSlidesToStore(slideData, id || undefined);
+                    showToast('Slide Promo berhasil disimpan!');
+                    navigate('page-admin');
+                } catch (e) {
+                    console.error("Error saving slide:", e);
+                    if (slideFormError) slideFormError.textContent = 'Gagal menyimpan slide. Cek konsol.';
                 }
-
-                savePromoSlides();
-                renderHomePromoSlider();
-                renderAdminPromoSlideList();
-                showToast('Slide Promo berhasil disimpan!');
-                navigate('page-admin');
             }
             
             function showSlideDeleteConfirmation(id) {
                 const slide = promoSlides.find(s => s.id === id);
-                if (!slide || slide.isDefault) {
-                     showToast("Slide default tidak dapat dihapus.");
-                     return;
-                }
+                if (!slide) return;
+                
                 slideToDeleteId = id;
                 slideToDeleteNameEl.textContent = slide.title;
                 deleteSlideModal.classList.remove('hidden');
             }
 
-            function handleDeleteSlide() {
+            async function handleDeleteSlide() {
                 if (!slideToDeleteId) return;
 
-                promoSlides = promoSlides.filter(s => s.id !== slideToDeleteId);
-                savePromoSlides();
-                
-                renderHomePromoSlider();
-                renderAdminPromoSlideList();
-                deleteSlideModal.classList.add('hidden');
-                showToast('Slide Promo berhasil dihapus.');
-                slideToDeleteId = null;
+                try {
+                    await deletePromoSlideFromStore(slideToDeleteId);
+                    deleteSlideModal.classList.add('hidden');
+                    showToast('Slide Promo berhasil dihapus.');
+                    slideToDeleteId = null;
+                } catch (e) {
+                    console.error("Error deleting slide:", e);
+                    showToast('Gagal menghapus slide. Cek konsol.');
+                }
             }
 
             // --- AKHIR FUNGSI PROMO SLIDE ---
-
+            
             // FUNGSI SHARE UTAMA (Dipertahankan)
             async function handleShare(productName) {
                 if (isSharing) return;
@@ -1062,7 +1207,7 @@
                 const text = `Cek produk keren ini: ${productName} dari Kriuké Snack! Kriuknya Beda, Rasanya Istimewa.`;
 
                 if (navigator.share) {
-                    isSharing = true; 
+                    isSharing = true;  
                     try {
                         await navigator.share({
                             title: `Kriuké Snack - ${productName}`,
@@ -1168,17 +1313,24 @@
                 } else if (pageId === 'page-liked') {
                     renderLikedPage();
                 } else if (pageId === 'page-admin') {
-                    renderAdminSettings(); 
-                    renderAdminCategoryList();
-                    renderAdminPromoList(); 
-                    renderAdminPromoSlideList(); // BARU
-                    renderAdminList();
+                    // Check if admin page is accessed
+                    if (!isLoggedIn) {
+                        navigate('page-login');
+                        return;
+                    }
+                    if (isFirestoreReady) {
+                        renderAdminSettings(); 
+                        renderAdminCategoryList();
+                        renderAdminPromoList(); 
+                        renderAdminPromoSlideList();
+                        renderAdminList();
+                    }
                 }
 
                 navButtons.forEach(btn => {
                     const target = btn.dataset.target;
                     const isActivePage = (target === pageId) || 
-                                         (target === 'page-login' && (pageId === 'page-admin' || pageId === 'page-edit' || pageId === 'page-promo-edit' || pageId === 'page-slide-edit')) || // Tambah page-slide-edit
+                                         (target === 'page-login' && (pageId === 'page-admin' || pageId === 'page-edit' || pageId === 'page-promo-edit' || pageId === 'page-slide-edit' || pageId === 'page-category-edit')) || // Tambah page-category-edit
                                          (target === 'page-cart' && pageId === 'page-checkout'); 
 
                     btn.classList.remove('text-orange-600', 'text-gray-600', 'text-red-500');
@@ -1234,8 +1386,12 @@
                 if (totalReviews > 0) {
                     const ratingCounts = [0, 0, 0, 0, 0]; 
                     product.reviews.forEach(r => {
-                        if (r.rating >= 4) {
-                            ratingCounts[r.rating - 1]++;
+                        if (r.rating >= 1 && r.rating <= 5) {
+                             // Assuming r.rating is an integer 1-5 for simplicity in bar chart
+                            const ratingIndex = Math.floor(r.rating);
+                            if (ratingIndex > 0) {
+                                ratingCounts[ratingIndex - 1]++;
+                            }
                         }
                     });
                     
@@ -1398,14 +1554,14 @@
                 if (!product) return;
 
                 const message = encodeURIComponent(
-                    `Halo Kriuké Snack, saya ingin memesan 1x *${name.toUpperCase()}* (Rp${formatRupiah(product.price)}). Mohon konfirmasi pesanan saya. Terima kasih!`
+                    `Halo Kriuké Snack, saya ingin memesan 1x *${product.name.toUpperCase()}* (Rp${formatRupiah(product.price)}). Mohon konfirmasi pesanan saya. Terima kasih!`
                 );
                 
                 const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
                 window.open(waUrl, '_blank');
             }
             
-            // === FUNGSI LIKE/DISLIKE (Dipertahankan) ===
+            // === FUNGSI LIKE/DISLIKE (Dipertahankan menggunakan localStorage) ===
             function saveLikedProducts() {
                 localStorage.setItem('kriuke_liked', JSON.stringify(likedProducts));
             }
@@ -1417,8 +1573,8 @@
                 if (index > -1) {
                     likedProducts.splice(index, 1);
                     buttons.forEach(button => {
-                         button.classList.remove('fa-solid', 'text-red-500');
-                         button.classList.add('fa-regular', 'text-gray-300');
+                        button.classList.remove('fa-solid', 'text-red-500');
+                        button.classList.add('fa-regular', 'text-gray-300');
                     });
                     showToast('Produk dihapus dari favorit.');
                 } else {
@@ -1482,7 +1638,7 @@
 
                     productCard.querySelector('.relative').addEventListener('click', () => showProductDetail(product.id));
 
-                    productCard.querySelector('.unlike-btn').addEventListener('click', (e) => {
+                    productCard.querySelector('.like-btn').addEventListener('click', (e) => {
                         e.stopPropagation();
                         handleToggleLike(product.id);
                     });
@@ -1502,7 +1658,8 @@
 
                 let filteredProducts = products.filter(p => {
                     const searchInput = document.getElementById('search-input').value.toLowerCase().trim();
-                    const matchesCategory = (filterCategory === 'Semua') ? true : p.category === filterCategory;
+                    // Ensure the category list is up-to-date from Firestore before filtering
+                    const matchesCategory = (filterCategory === 'Semua') ? true : p.category === filterCategory; 
                     const matchesSearch = p.name.toLowerCase().includes(searchInput) || 
                                           p.subtitle.toLowerCase().includes(searchInput) || 
                                           p.description.toLowerCase().includes(searchInput);
@@ -1605,13 +1762,13 @@
                 });
             }
 
-            // FUNGSI KATEGORI (Dipertahankan)
+            // FUNGSI KATEGORI (UPDATED to rely on the Firestore listener)
             function renderCategoryFilters() {
-                const productCategories = products.map(p => p.category).filter(c => c); 
-                const allCategories = ['Semua', ...categories]; 
-                const uniqueCategories = [...new Set(allCategories)]; 
+                // Categories array is now updated by the onSnapshot listener
                 
                 categoryFilterContainer.innerHTML = ''; 
+
+                const uniqueCategories = ['Semua', ...new Set(categories)]; // Ensure 'Semua' is first
 
                 uniqueCategories.forEach(category => {
                     const button = document.createElement('button');
@@ -1637,69 +1794,143 @@
                 });
             }
 
-
-            // === FUNGSI KATEGORI ADMIN (Dipertahankan) ===
-            function loadCategories() {
-                const storedCategories = localStorage.getItem('kriuke_categories');
-                if (storedCategories) {
-                    categories = JSON.parse(storedCategories);
-                } else {
-                    categories = ['Keripik Pisang', 'Promo Spesial', 'Manis', 'Gurih', 'Pedas', 'Lainnya'];
-                    saveCategories();
-                }
-            }
-            
-            function saveCategories() {
-                localStorage.setItem('kriuke_categories', JSON.stringify(categories));
+            // Utility function for slugging category names
+            function slugify(text) {
+                return text.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
             }
 
-            function handleAddCategory(e) {
+            // === FUNGSI KATEGORI ADMIN (DIUBAH KE FIRESTORE) ===
+
+            async function handleAddCategory(e) {
                 e.preventDefault();
+                if (!isFirestoreReady) return showToast("Data belum siap. Coba lagi.");
+                
                 const newCategory = newCategoryNameInput.value.trim();
+                const newCategorySlug = slugify(newCategory);
                 
                 if (newCategory && !categories.includes(newCategory)) {
-                    categories.push(newCategory);
-                    saveCategories();
-                    renderAdminCategoryList();
-                    renderCategoryFilters();
-                    newCategoryNameInput.value = '';
-                    showToast(`Kategori "${newCategory}" berhasil ditambahkan.`);
+                    const newCatRef = doc(db, `artifacts/${appId}/public/data/categories`, newCategorySlug);
+                    try {
+                         // Use the category name as the document ID (case-insensitive key)
+                        await setDoc(newCatRef, { name: newCategory });
+                        newCategoryNameInput.value = '';
+                        showToast(`Kategori "${newCategory}" berhasil ditambahkan.`);
+                    } catch (e) {
+                        console.error("Error adding category:", e);
+                        showToast(`Gagal menambahkan kategori.`);
+                    }
                 } else if (categories.includes(newCategory)) {
                     showToast(`Kategori "${newCategory}" sudah ada!`);
                 }
             }
             
             function showCategoryDeleteConfirmation(category) {
-                const defaultCategories = ['Semua', 'Keripik Pisang', 'Promo Spesial', 'Manis', 'Gurih', 'Pedas', 'Lainnya'];
+                const defaultCategories = ['Keripik Pisang', 'Promo Spesial', 'Manis', 'Gurih', 'Pedas', 'Lainnya'];
                 if (defaultCategories.includes(category)) {
-                     showToast(`Kategori default "${category}" tidak dapat dihapus.`);
-                     return;
+                    showToast(`Kategori default "${category}" tidak dapat dihapus.`);
+                    return;
                 }
                 categoryToDelete = category;
                 categoryToDeleteNameEl.textContent = category;
                 deleteCategoryModal.classList.remove('hidden');
             }
 
-            function handleDeleteCategory() {
+            async function handleDeleteCategory() {
                 if (!categoryToDelete) return;
                 
                 const deletedCategory = categoryToDelete;
-                categories = categories.filter(c => c !== deletedCategory);
-                saveCategories();
+                const catDocId = slugify(deletedCategory);
+                const catRef = doc(db, `artifacts/${appId}/public/data/categories`, catDocId);
 
-                products.forEach(p => {
-                    if (p.category === deletedCategory) {
-                        p.category = 'Lainnya';
-                    }
-                });
-                saveProducts();
+                try {
+                    await deleteDoc(catRef);
+
+                    // Update local products that used this category
+                    products.forEach(p => {
+                        if (p.category === deletedCategory) {
+                            p.category = 'Lainnya';
+                        }
+                    });
+                    saveProducts();
+
+                    deleteCategoryModal.classList.add('hidden');
+                    showToast(`Kategori "${deletedCategory}" berhasil dihapus.`);
+                    categoryToDelete = null;
+                } catch (e) {
+                    console.error("Error deleting category:", e);
+                    showToast(`Gagal menghapus kategori.`);
+                }
+            }
+
+            // BARU: FUNGSI UNTUK MENAMPILKAN FORM EDIT KATEGORI
+            function showCategoryEditForm(name) {
+                categoryEditFormTitle.textContent = `Edit Kategori: ${name}`;
+                categoryOriginalNameInput.value = name; // Simpan nama lama
+                categoryNewNameInput.value = name; // Isi dengan nama lama
+                categoryEditFormError.textContent = '';
+                navigate('page-category-edit');
+            }
+
+            // BARU: FUNGSI UNTUK MENGIRIM FORM EDIT KATEGORI
+            async function handleCategoryEditFormSubmit(e) {
+                e.preventDefault();
+                if (!isFirestoreReady) return showToast("Data belum siap. Coba lagi.");
+                categoryEditFormError.textContent = '';
+
+                const originalName = categoryOriginalNameInput.value.trim();
+                const newName = categoryNewNameInput.value.trim();
+                const originalSlug = slugify(originalName);
+                const newSlug = slugify(newName);
+
+                if (!newName) {
+                    categoryEditFormError.textContent = 'Nama kategori tidak boleh kosong.';
+                    return;
+                }
                 
-                renderAdminCategoryList();
-                renderCategoryFilters();
-                renderAdminList();
-                deleteCategoryModal.classList.add('hidden');
-                showToast(`Kategori "${deletedCategory}" berhasil dihapus.`);
-                categoryToDelete = null;
+                if (newName === originalName) {
+                    // Hanya casing/kapitalisasi yang berubah
+                    const catRef = doc(db, `artifacts/${appId}/public/data/categories`, originalSlug);
+                    try {
+                        await updateDoc(catRef, { name: newName });
+                        showToast(`Kategori "${newName}" berhasil diperbarui.`);
+                        navigate('page-admin');
+                    } catch (e) {
+                        console.error("Error updating category casing:", e);
+                        categoryEditFormError.textContent = 'Gagal memperbarui kategori.';
+                    }
+                    return;
+                }
+
+                // Cek apakah nama baru sudah ada (case-insensitive check)
+                if (categories.some(c => c.toLowerCase() === newName.toLowerCase())) {
+                    categoryEditFormError.textContent = `Kategori "${newName}" sudah ada!`;
+                    return;
+                }
+
+                // Lakukan Rename: Buat dokumen baru, hapus dokumen lama
+                try {
+                    // 1. Buat dokumen baru dengan nama baru (dan slug baru)
+                    const newCatRef = doc(db, `artifacts/${appId}/public/data/categories`, newSlug);
+                    await setDoc(newCatRef, { name: newName });
+
+                    // 2. Hapus dokumen lama
+                    const oldCatRef = doc(db, `artifacts/${appId}/public/data/categories`, originalSlug);
+                    await deleteDoc(oldCatRef);
+
+                    // 3. Update produk lokal yang masih menggunakan nama kategori lama
+                    products.forEach(p => {
+                        if (p.category === originalName) {
+                            p.category = newName;
+                        }
+                    });
+                    saveProducts();
+
+                    showToast(`Kategori berhasil diganti namanya menjadi "${newName}"!`);
+                    navigate('page-admin');
+                } catch (e) {
+                    console.error("Error renaming category:", e);
+                    categoryEditFormError.textContent = 'Gagal mengganti nama kategori.';
+                }
             }
             
             function renderAdminCategoryList() {
@@ -1711,15 +1942,25 @@
                 }
 
                 categories.forEach(category => {
-                    const isDefault = ['Keripik Pisang', 'Promo Spesial', 'Manis', 'Gurih', 'Pedas', 'Lainnya'].includes(category);
+                    const isDefault = ['Keripik Pisang', 'Promo Spesial', 'Manis', 'Gurih', 'Pedas', 'Lainnya', 'Semua'].includes(category);
                     const item = document.createElement('div');
-                    item.className = 'flex items-center bg-white border rounded-full pl-3 pr-2 py-1 shadow-sm';
+                    // Menggunakan flex-wrap-reverse agar tombol edit/hapus berada di paling kanan jika layar kecil
+                    item.className = 'flex items-center justify-between bg-white border rounded-lg pl-3 pr-2 py-1 shadow-sm w-full mb-2'; 
+                    
+                    const controls = !isDefault ? `
+                        <div class="flex gap-1.5 flex-shrink-0">
+                            <button data-category="${category}" class="edit-category-btn p-1 text-blue-500 hover:text-blue-700 transition-colors" title="Edit Kategori">
+                                <i class="fa-solid fa-pen-to-square text-sm"></i>
+                            </button>
+                            <button data-category="${category}" class="delete-category-btn p-1 text-red-500 hover:text-red-700 transition-colors" title="Hapus Kategori">
+                                <i class="fa-solid fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    ` : '';
+
                     item.innerHTML = `
                         <span class="text-sm font-medium text-gray-700">${category}</span>
-                        ${!isDefault ? `
-                        <button data-category="${category}" class="delete-category-btn ml-2 p-1 text-red-500 hover:text-red-700">
-                            <i class="fa-solid fa-times text-xs"></i>
-                        </button>` : ''}
+                        ${controls}
                     `;
                     categoryListAdmin.appendChild(item);
                 });
@@ -1728,6 +1969,14 @@
                     btn.addEventListener('click', (e) => {
                         const category = e.currentTarget.dataset.category;
                         showCategoryDeleteConfirmation(category);
+                    });
+                });
+
+                // Memastikan event listener edit terpasang kembali
+                document.querySelectorAll('.edit-category-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const category = e.currentTarget.dataset.category;
+                        showCategoryEditForm(category);
                     });
                 });
             }
@@ -1749,7 +1998,7 @@
             }
 
 
-            // === FUNGSI DATA & ADMIN PRODUK (Dipertahankan) ===
+            // === FUNGSI DATA & ADMIN PRODUK (tetap menggunakan localStorage untuk Produk) ===
             function loadProducts() {
                 const storedProducts = localStorage.getItem('kriuke_products');
                 if (storedProducts) {
@@ -1759,7 +2008,7 @@
                         { id: 'p1', name: 'kripik pisang rasa original', subtitle: 'Gurih alami, kriuknya beda.', price: 25000, rating: 4.8, category: 'Keripik Pisang', images: ['https://placehold.co/300x300/FEE300/000000?text=Original+Pack', 'https://placehold.co/300x300/8D6E63/FFFFFF?text=Original+Detail'], description: 'Kripik pisang renyah dengan rasa asli pisang yang gurih alami. Cocok untuk semua kalangan dan camilan harian Anda. Kriuknya beda, rasanya istimewa!', isLiked: false, reviews: [{ user: 'Ani', rating: 5, date: '10/05/2025', comment: 'Rasa original yang selalu bikin kangen! Kriuknya pas, tidak terlalu manis.' }, { user: 'Budi', rating: 4, date: '12/05/2025', comment: 'Kualitas oke, packing aman. Hanya saja pengiriman agak lambat.' }] },
                         { id: 'p2', name: 'kriuke rasa coklat', subtitle: 'Promo Spesial: lumer coklat premium.', price: 20000, originalPrice: 28000, rating: 4.7, category: 'Promo Spesial', images: ['https://placehold.co/300x300/795548/FFFFFF?text=Coklat+Pack', 'https://placehold.co/300x300/795548/FFFFFF?text=Coklat+Detail'], description: 'Promo Spesial! Kripik pisang renyah dibalut dengan coklat premium yang lumer di mulut. Kriuknya beda, rasanya istimewa!', isLiked: false, reviews: [{ user: 'Citra', rating: 5, date: '01/06/2025', comment: 'Coklatnya tebal! Harga promo sangat worth it. Anak-anak suka sekali.' }, { user: 'Dedi', rating: 4, date: '05/06/2025', comment: 'Enak, tapi sedikit terlalu manis untuk saya. Overall bagus!' }] },
                         { id: 'p3', name: 'kripik pisang rasa balado', subtitle: 'Pedas manis bumbu balado khas.', price: 18000, rating: 4.5, category: 'Pedas', images: ['https://placehold.co/300x300/F44336/FFFFFF?text=Balado+Pack'], description: 'Sensasi pedas manis bumbu balado khas yang bikin ketagihan. Dibuat dari cabai pilihan dan bumbu rempah Indonesia. Berani coba?', isLiked: false, reviews: [{ user: 'Eka', rating: 5, date: '15/05/2025', comment: 'Pedasnya pas dan bumbunya melimpah! Bikin nagih, harus coba rasa ini.' }] },
-                        { id: 'p4', name: 'kriuke rasa pedas manis', subtitle: 'Manis gula aren dan sensasi pedas hangat.', price: 19000, rating: 4.9, category: 'Manis', images: ['https://placehold.co/300x300/D32F2F/FFFFFF?text=Pedas+Manis+Pack'], description: 'Perpaduan sempurna antara rasa manis gula aren dan sensasi pedas yang hangat. Rasa yang pasti disukai semua orang!', isLiked: false, reviews: [{ user: 'Fani', rating: 5, date: '20/05/2025', comment: 'Gilaa ini enak banget, perpaduan manis dan pedasnya seimbang.' }, { user: 'Gatot', rating: 5, date: '22/05/2025', comment: 'Selalu beli yang ini. Terbaikkkk.' }] },
+                        { id: 'p4', name: 'kriuke rasa pedas manis', subtitle: 'Manis gula aren dan sensasi pedas hangat.', price: 19000, rating: 4.9, category: 'Manis', images: ['https://placehold.co/300x300/D32F2F/FFFFFF?text=Pedas+Manis+Pack'], description: 'Perpaduan sempurna antara rasa manis gula aren dan sensasi pedas yang hangat. Rasa yang pasti disukai semua orang!', isLiked: false, reviews: [{ user: 'Fani', rating: 5, date: '20/05/2025', comment: 'Gilaa ini enak banget, perpaduan manis dan pedasnya seimbang.' }, { user: 'Gatot', rating: 5, date: '22/05/025', comment: 'Selalu beli yang ini. Terbaikkkk.' }] },
                         { id: 'p5', name: 'kripik pisang rasa matcha', subtitle: 'Untuk pecinta teh hijau Jepang.', price: 22000, rating: 4.6, category: 'Manis', images: ['https://placehold.co/300x300/4CAF50/FFFFFF?text=Matcha+Pack', 'https://placehold.co/300x300/4CAF50/FFFFFF?text=Matcha+Detail'], description: 'Bagi pecinta teh hijau! Kriuké dengan bubuk matcha asli Jepang, memberikan rasa manis pahit yang unik dan menenangkan.', isLiked: false, reviews: [] },
                         { id: 'p6', name: 'kriuke rasa sapi panggang', subtitle: 'Gurihnya bumbu sapi panggang premium.', price: 21000, rating: 4.3, category: 'Gurih', images: ['https://placehold.co/300x300/6D4C41/FFFFFF?text=Sapi+Panggang+Pack', 'https://placehold.co/300x300/6D4C41/FFFFFF?text=Sapi+Panggang+Detail'], description: 'Nikmati sensasi gurihnya bumbu sapi panggang premium dalam setiap gigitan kriuk. Cocok untuk Anda yang suka rasa asin dan gurih.', isLiked: false, reviews: [{ user: 'Hana', rating: 4, date: '01/07/2025', comment: 'Rasa gurih yang mantap! Cocok buat teman nonton bola.' }] }
                     ];
@@ -1780,11 +2029,14 @@
                     isLoggedIn = true;
                     loginError.textContent = '';
                     loginForm.reset();
-                    renderAdminSettings(); 
-                    renderAdminCategoryList();
-                    renderAdminPromoList(); 
-                    renderAdminPromoSlideList(); // BARU
-                    renderAdminList();
+                    
+                    if (isFirestoreReady) {
+                        renderAdminSettings(); 
+                        renderAdminCategoryList();
+                        renderAdminPromoList(); 
+                        renderAdminPromoSlideList();
+                        renderAdminList();
+                    }
                     navigate('page-admin');
                 } else {
                     isLoggedIn = false;
@@ -1816,7 +2068,7 @@
                 productImagesInput.value = ''; 
                 productOriginalPriceInput.value = ''; 
                 
-                const defaultCategory = categories.includes('Keripik Pisang') ? 'Keripik Pisang' : '';
+                const defaultCategory = categories.includes('Keripik Pisang') ? 'Keripik Pisang' : categories[0];
                 renderCategoryOptions(defaultCategory); 
                 
                 navigate('page-edit');
@@ -1887,7 +2139,14 @@
 
                 if (id) {
                     const index = products.findIndex(p => p.id === id);
-                    products[index] = { ...products[index], ...productData };
+                    if (index !== -1) {
+                         products[index] = { ...products[index], ...productData };
+                    } else {
+                        // If product ID exists in liked/cart but not products, treat as new
+                         productData.id = 'p' + (new Date().getTime());
+                         products.push(productData);
+                    }
+                   
                 } else {
                     productData.id = 'p' + (new Date().getTime());
                     products.push(productData);
@@ -1981,24 +2240,20 @@
                 });
             }
             
-            // === FUNGSI ADMIN PROMO CODE (Dipertahankan) ===
+            // === FUNGSI ADMIN PROMO CODE (DIUBAH KE FIRESTORE) ===
+            // loadPromoCodes and savePromoCodes replaced by Firestore listeners/handlers
 
-            function loadPromoCodes() {
-                const storedPromoCodes = localStorage.getItem('kriuke_promo_codes');
-                if (storedPromoCodes) {
-                    promoCodes = JSON.parse(storedPromoCodes);
-                } else {
-                    promoCodes = {
-                        'KRIUKHEMAT': { type: 'percent', value: 10, description: 'Diskon 10% untuk total belanja' },
-                        'DISKON10K': { type: 'fixed', value: 10000, description: 'Potongan harga Rp 10.000' },
-                        'FREEONGKIR': { type: 'fixed', value: 5000, description: 'Potongan biaya kirim (simulasi)' }
-                    };
-                    savePromoCodes();
-                }
+            function savePromoCodeToStore(code, promoData) {
+                if (!isFirestoreReady) return showToast("Data belum siap. Coba lagi.");
+                
+                const promoRef = doc(db, `artifacts/${appId}/public/data/promo_codes`, code);
+                return setDoc(promoRef, promoData);
             }
 
-            function savePromoCodes() {
-                localStorage.setItem('kriuke_promo_codes', JSON.stringify(promoCodes));
+            async function deletePromoCodeFromStore(code) {
+                 if (!isFirestoreReady) return showToast("Data belum siap. Coba lagi.");
+                 const promoRef = doc(db, `artifacts/${appId}/public/data/promo_codes`, code);
+                 return deleteDoc(promoRef);
             }
 
             function updatePromoValueHint() {
@@ -2015,6 +2270,7 @@
                 promoOriginalCodeInput.value = '';
                 promoFormTitle.textContent = 'Tambah Kode Promo Baru';
                 promoFormError.textContent = '';
+                promoTypeSelect.removeEventListener('change', updatePromoValueHint);
                 promoTypeSelect.addEventListener('change', updatePromoValueHint);
                 updatePromoValueHint();
 
@@ -2034,8 +2290,9 @@
                 navigate('page-promo-edit');
             }
 
-            function handlePromoFormSubmit(e) {
+            async function handlePromoFormSubmit(e) {
                 e.preventDefault();
+                if (!isFirestoreReady) return showToast("Data belum siap. Coba lagi.");
                 promoFormError.textContent = '';
 
                 const originalCode = promoOriginalCodeInput.value.toUpperCase();
@@ -2054,28 +2311,28 @@
                     return;
                 }
                 
-                if (originalCode && originalCode !== newCode) {
-                    delete promoCodes[originalCode];
-                    if (appliedPromo === originalCode) {
-                        appliedPromo = null;
-                        promoCodeInput.value = '';
-                        promoStatusText.textContent = '';
-                    }
-                } 
-                
-                promoCodes[newCode] = {
-                    type: newType,
-                    value: newValue,
-                    description: newDescription
-                };
+                try {
+                    // Handle rename/update
+                    if (originalCode && originalCode !== newCode) {
+                        await deletePromoCodeFromStore(originalCode);
+                        if (appliedPromo === originalCode) {
+                             appliedPromo = null;
+                        }
+                    } 
+                    
+                    const promoData = {
+                        type: newType,
+                        value: newValue,
+                        description: newDescription
+                    };
 
-                savePromoCodes();
-                showToast(`Kode promo "${newCode}" berhasil disimpan.`);
-                renderAdminPromoList();
-                if (document.getElementById('page-cart').classList.contains('active')) {
-                    updateCartTotalsUI();
+                    await savePromoCodeToStore(newCode, promoData);
+                    showToast(`Kode promo "${newCode}" berhasil disimpan.`);
+                    navigate('page-admin');
+                } catch (e) {
+                    console.error("Error saving promo code:", e);
+                    promoFormError.textContent = 'Gagal menyimpan kode promo. Cek konsol.';
                 }
-                navigate('page-admin');
             }
             
             function renderAdminPromoList() {
@@ -2089,7 +2346,8 @@
 
                 codes.forEach(code => {
                     const promo = promoCodes[code];
-                    const isDefault = ['KRIUKHEMAT', 'DISKON10K', 'FREEONGKIR'].includes(code);
+                    // Default checks are now purely stylistic/warning, actual data comes from Firestore
+                    const isDefault = ['KRIUKHEMAT', 'DISKON10K', 'FREEONGKIR'].includes(code); 
                     
                     const item = document.createElement('div');
                     item.className = 'flex items-center justify-between bg-white p-3 rounded-lg shadow-sm border border-orange-200';
@@ -2106,7 +2364,7 @@
                             <button class="edit-promo-btn p-2 text-blue-500 hover:text-blue-700 transition-colors" data-code="${code}" aria-label="Edit Promo">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
-                            <button class="delete-promo-btn p-2 text-red-500 hover:text-red-700 transition-colors ${isDefault ? 'opacity-50 cursor-not-allowed' : ''}" data-code="${code}" ${isDefault ? 'disabled' : ''} aria-label="Hapus Promo">
+                            <button class="delete-promo-btn p-2 text-red-500 hover:text-red-700 transition-colors" data-code="${code}" aria-label="Hapus Promo">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -2120,24 +2378,25 @@
                     });
                 });
 
-                document.querySelectorAll('.delete-promo-btn:not([disabled])').forEach(btn => {
+                document.querySelectorAll('.delete-promo-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
-                        showPromoDeleteConfirmation(e.currentTarget.dataset.code);
+                         // Only show confirmation if it's not a pre-loaded default key
+                        if (['KRIUKHEMAT', 'DISKON10K', 'FREEONGKIR'].includes(e.currentTarget.dataset.code)) {
+                             showToast(`Kode promo default tidak dapat dihapus di sini.`);
+                        } else {
+                            showPromoDeleteConfirmation(e.currentTarget.dataset.code);
+                        }
                     });
                 });
             }
 
             function showPromoDeleteConfirmation(code) {
-                if (['KRIUKHEMAT', 'DISKON10K', 'FREEONGKIR'].includes(code)) {
-                    showToast(`Kode promo default "${code}" tidak dapat dihapus.`);
-                    return;
-                }
                 promoCodeToDelete = code;
                 promoToDeleteNameEl.textContent = code;
                 deletePromoModal.classList.remove('hidden');
             }
 
-            function handleDeletePromo() {
+            async function handleDeletePromo() {
                 if (!promoCodeToDelete) return;
 
                 if (appliedPromo === promoCodeToDelete) {
@@ -2149,16 +2408,19 @@
                     }
                 }
 
-                delete promoCodes[promoCodeToDelete];
-                savePromoCodes();
-                
-                renderAdminPromoList();
-                deletePromoModal.classList.add('hidden');
-                showToast(`Kode promo "${promoCodeToDelete}" berhasil dihapus.`);
-                promoCodeToDelete = null;
+                try {
+                    await deletePromoCodeFromStore(promoCodeToDelete);
+                    deletePromoModal.classList.add('hidden');
+                    showToast(`Kode promo "${promoCodeToDelete}" berhasil dihapus.`);
+                    promoCodeToDelete = null;
+                } catch (e) {
+                    console.error("Error deleting promo code:", e);
+                    showToast(`Gagal menghapus kode promo. Cek konsol.`);
+                }
             }
 
-            // === FUNGSI KERANJANG & PROMO (Dipertahankan) ===
+
+            // === FUNGSI KERANJANG & PROMO (Dipertahankan menggunakan localStorage) ===
 
             function loadCart() {
                 const storedCart = localStorage.getItem('kriuke_cart');
@@ -2441,97 +2703,131 @@
                 // Hapus logika timer karena sekarang adalah scrollable
             }
 
-            // INISIALISASI & EVENT LISTENER (Dipertahankan)
-            
-            menuToggleBtn.addEventListener('click', () => toggleMenu(true));
-            menuCloseBtn.addEventListener('click', () => toggleMenu(false));
-            menuOverlay.addEventListener('click', () => toggleMenu(false));
-            
-            addCategoryForm.addEventListener('submit', handleAddCategory);
-            cancelCategoryDeleteBtn.addEventListener('click', () => deleteCategoryModal.classList.add('hidden'));
-            confirmCategoryDeleteBtn.addEventListener('click', handleDeleteCategory); 
-            
-            addPromoBtn.addEventListener('click', () => showPromoForm());
-            promoForm.addEventListener('submit', handlePromoFormSubmit);
-            cancelPromoDeleteBtn.addEventListener('click', () => deletePromoModal.classList.add('hidden'));
-            confirmPromoDeleteBtn.addEventListener('click', handleDeletePromo);
-            
-            tiktokLiveForm.addEventListener('submit', handleTikTokLiveForm);
-            
-            // Event Listener Slide Admin BARU
-            addSlideBtn.addEventListener('click', () => showSlideForm());
-            slideForm.addEventListener('submit', handleSlideFormSubmit);
-            cancelSlideDeleteBtn.addEventListener('click', () => deleteSlideModal.classList.add('hidden'));
-            confirmSlideDeleteBtn.addEventListener('click', handleDeleteSlide);
-
-
-            productCategorySelect.addEventListener('change', (e) => {
-                toggleOriginalPriceInput(e.target.value);
-            });
-
-            document.getElementById('search-input').addEventListener('input', () => {
-                renderHomeProducts(activeCategory);
-            });
-
-            document.body.addEventListener('click', (e) => {
-                const button = e.target.closest('.navigate-btn');
-                if (button) {
-                    const target = button.dataset.target;
+            function initializeAppLogic(isFallback = false) {
+                if (!isFallback) {
+                    listenToFirestoreData();
+                } else {
+                    // Fallback (Original localStorage logic)
+                    // Since the fallback is complex and this is a single file,
+                    // we keep the default data in localStorage calls.
+                    const defaultSettings = { tiktokLiveUrl: 'https://www.tiktok.com/@kriukesnack' };
+                    settings = JSON.parse(localStorage.getItem('kriuke_settings') || JSON.stringify(defaultSettings));
+                    categories = JSON.parse(localStorage.getItem('kriuke_categories') || JSON.stringify(['Keripik Pisang', 'Promo Spesial', 'Manis', 'Gurih', 'Pedas', 'Lainnya']));
                     
-                    if (offCanvasMenu.contains(button) && target) {
-                        toggleMenu(false);
-                        setTimeout(() => {
-                            if (target === 'page-admin' || target === 'page-edit' || target === 'page-promo-edit' || target === 'page-slide-edit' || target === 'page-login') { // Tambah page-slide-edit
-                                navigate(isLoggedIn ? 'page-admin' : 'page-login');
-                            } else {
-                                navigate(target);
-                            }
-                        }, 50);
-                        return;
-                    }
+                    // --- DATA PROMO CODE DEFAULT (DIPERBARUI) ---
+                    promoCodes = JSON.parse(localStorage.getItem('kriuke_promo_codes') || JSON.stringify({
+                         'HEMAT10': { type: 'percent', value: 10, description: 'Diskon 10% untuk total belanja' },
+                         'FREESHIP': { type: 'fixed', value: 15000, description: 'Potongan biaya kirim Rp 15.000' },
+                         'BELI2': { type: 'fixed', value: 5000, description: 'Potongan Rp 5.000 untuk minimal 2 produk' }
+                    }));
+                    
+                    // --- DATA PROMO SLIDE DEFAULT (DIPERBARUI) ---
+                    promoSlides = JSON.parse(localStorage.getItem('kriuke_promo_slides') || JSON.stringify([
+                         { id: 's1', title: 'DISKON HARI GAJIAN 20%', imageUrl: 'https://placehold.co/400x120/007bff/FFFFFF?text=Gajian+Sale+20%25', linkUrl: '#', isDefault: true },
+                         { id: 's2', title: 'COBA GRATIS - Klik di sini!', imageUrl: 'https://placehold.co/400x120/4CAF50/FFFFFF?text=Coba+Gratis', linkUrl: '#', isDefault: true },
+                         { id: 's3', title: 'KODE PROMO: HEMAT10', imageUrl: 'https://placehold.co/400x120/FF6B00/FFFFFF?text=Kode+HEMAT10', linkUrl: '#', isDefault: true },
+                    ]));
 
-                    if (target === 'page-admin' || target === 'page-edit' || target === 'page-promo-edit' || target === 'page-slide-edit' || target === 'page-login') { // Tambah page-slide-edit
-                        navigate(isLoggedIn ? 'page-admin' : 'page-login');
-                    } else {
-                        navigate(target);
-                    }
+                    updateTikTokLiveLink();
+                    renderHomePromoSlider();
+                    renderCategoryFilters();
+                    
+                    // Keep original fallback init for consistency
+                    loadProducts();
+                    loadCart();
+                    renderHomeProducts();
+                    navigate('page-home');
                 }
-            });
 
-            loginForm.addEventListener('submit', handleLogin);
-            logoutBtn.addEventListener('click', handleLogout);
-            addNewBtn.addEventListener('click', showAddForm);
-            productForm.addEventListener('submit', handleFormSubmit);
-            cancelEditBtns.forEach(btn => {
-                btn.addEventListener('click', () => navigate('page-admin'));
-            });
+                 // INITIALIZE GLOBAL LISTENERS ONLY ONCE
+                document.body.addEventListener('click', (e) => {
+                    const button = e.target.closest('.navigate-btn');
+                    if (button) {
+                        const target = button.dataset.target;
+                        
+                        if (offCanvasMenu.contains(button) && target) {
+                            toggleMenu(false);
+                            setTimeout(() => {
+                                if (target === 'page-admin' || target === 'page-edit' || target === 'page-promo-edit' || target === 'page-slide-edit' || target === 'page-category-edit' || target === 'page-login') { 
+                                    navigate(isLoggedIn ? 'page-admin' : 'page-login');
+                                } else {
+                                    navigate(target);
+                                }
+                            }, 50);
+                            return;
+                        }
 
-            cancelDeleteBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
-            confirmDeleteBtn.addEventListener('click', handleDelete);
-            
-            checkoutWaBtn.addEventListener('click', () => {
-                navigate('page-checkout');
-            });
-            checkoutForm.addEventListener('submit', handleSendOrder);
-            
-            applyPromoBtn.addEventListener('click', handleApplyPromo);
-            promoCodeInput.addEventListener('focus', () => {
-                promoStatusText.textContent = ''; 
-                promoStatusText.classList.remove('text-red-500', 'text-green-600');
-            });
+                        if (target === 'page-admin' || target === 'page-edit' || target === 'page-promo-edit' || target === 'page-slide-edit' || target === 'page-category-edit' || target === 'page-login') { 
+                            navigate(isLoggedIn ? 'page-admin' : 'page-login');
+                        } else {
+                            navigate(target);
+                        }
+                    }
+                });
 
-            // Load data awal dan render UI
-            loadSettings(); 
-            loadCategories();
-            loadPromoCodes(); 
-            loadProducts();
-            loadPromoSlides(); // BARU: Muat slide promo
-            loadCart(); 
+                loginForm.addEventListener('submit', handleLogin);
+                logoutBtn.addEventListener('click', handleLogout);
+                addNewBtn.addEventListener('click', showAddForm);
+                productForm.addEventListener('submit', handleFormSubmit);
+                cancelEditBtns.forEach(btn => {
+                    btn.addEventListener('click', () => navigate('page-admin'));
+                });
 
-            renderHomePromoSlider(); // BARU: Render slider di Home
-            renderCategoryFilters();
-            renderHomeProducts();
-            navigate('page-home'); 
+                // BARU: Event Listener untuk form edit kategori
+                categoryEditForm.addEventListener('submit', handleCategoryEditFormSubmit);
+
+                cancelDeleteBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
+                confirmDeleteBtn.addEventListener('click', handleDelete);
+                
+                checkoutWaBtn.addEventListener('click', () => {
+                    navigate('page-checkout');
+                });
+                checkoutForm.addEventListener('submit', handleSendOrder);
+                
+                applyPromoBtn.addEventListener('click', handleApplyPromo);
+                promoCodeInput.addEventListener('focus', () => {
+                    promoStatusText.textContent = ''; 
+                    promoStatusText.classList.remove('text-red-500', 'text-green-600');
+                });
+
+                menuToggleBtn.addEventListener('click', () => toggleMenu(true));
+                menuCloseBtn.addEventListener('click', () => toggleMenu(false));
+                menuOverlay.addEventListener('click', () => toggleMenu(false));
+                
+                addCategoryForm.addEventListener('submit', handleAddCategory);
+                cancelCategoryDeleteBtn.addEventListener('click', () => deleteCategoryModal.classList.add('hidden'));
+                confirmCategoryDeleteBtn.addEventListener('click', handleDeleteCategory); 
+                
+                addPromoBtn.addEventListener('click', () => showPromoForm());
+                promoForm.addEventListener('submit', handlePromoFormSubmit);
+                cancelPromoDeleteBtn.addEventListener('click', () => deletePromoModal.classList.add('hidden'));
+                confirmPromoDeleteBtn.addEventListener('click', handleDeletePromo);
+                
+                tiktokLiveForm.addEventListener('submit', handleTikTokLiveForm);
+                
+                // Event Listener Slide Admin BARU
+                addSlideBtn.addEventListener('click', () => showSlideForm());
+                slideForm.addEventListener('submit', handleSlideFormSubmit);
+                cancelSlideDeleteBtn.addEventListener('click', () => deleteSlideModal.classList.add('hidden'));
+                confirmSlideDeleteBtn.addEventListener('click', handleDeleteSlide);
+
+
+                productCategorySelect.addEventListener('change', (e) => {
+                    toggleOriginalPriceInput(e.target.value);
+                });
+
+                document.getElementById('search-input').addEventListener('input', () => {
+                    renderHomeProducts(activeCategory);
+                });
+
+                if (!isFallback) {
+                     // Initial render after product load (Firestore listener handles other data)
+                    loadProducts();
+                    loadCart(); 
+                    renderHomeProducts();
+                    navigate('page-home');
+                }
+            }
         });
     </script>
 </body>
